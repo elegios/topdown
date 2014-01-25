@@ -1,0 +1,151 @@
+# General Description #
+=======================
+- Server and client communicates by sending specially formatted JSON over websockets.
+- The game plays in "ticks", where the amount of actions per tick is limited per character.
+- The server may decide whether actions are carried out immediately or after a call to "tick".
+- The server only responds with <tick-update>, one response per server tick, and <item>, one per "itemrequest".
+- Upon connecting the server will send one tick-update.
+- Moving into a character or other colliding object might be an attack, it might activate something
+(e.g. press a button), it might initiate conversation, or it might simply fail. It will consume an action regardless.
+
+
+# Commands #
+============
+
+{
+  command: "<identifying string>",
+  <possibly a bunch of more stuff, depending on the command>
+}
+
+{
+  command: "create",
+  name: <name>,
+}
+
+{
+  command: "tick",
+}
+
+{
+  command: "pickup",
+  character: <id>,
+}
+
+{
+  command: "itemrequest",
+  id: <id>,
+}
+
+{
+  command: "useitem",
+  action: <action>,
+  character: <id>,
+  item: <id>,
+}
+#<action> :: string, "drop" | "use"
+
+{
+  command: "move",
+  character: <id>,
+  direction: <direction>,
+}
+#<direction> :: string, <vertical> | <horizontal> | "through", possibly also diagonals in the form "<vertical><horizontal>"
+#<vertical> :: string, "up" | "down"
+#<horizontal> :: string, "left" | "right"
+
+
+
+# Responses #
+=============
+
+<tick-update>:
+{
+  maps: {
+    <mapname>: [
+      {
+        x: <x>
+        y: <y>
+        data: <bits>
+      }
+    ]
+  },
+  controllable: [<id>],
+  characters: [<character>],
+  props: {
+    <mapname>: [<prop>],
+  }
+  items: {
+    <mapname>: {
+      x: <x>,
+      y: <y>,
+      id: <id>
+    }
+  },
+  updates: [<update>],
+}
+#<bits> :: int (bitmasked), unspecified & 1 bit collides & 4 bit variation & 4 bits setid
+
+<update>:
+{
+  speech: <speech>,
+  character: <id>,
+  duration: <duration>,
+}
+or
+{
+  speech: <speech>,
+  x: <x>,
+  y: <y>,
+  duration: <duration>,
+}
+or
+{
+  damage: <damage>,
+  dealer: <id>, #not present if world damage
+  target: <id>,
+}
+
+<character>:
+{
+  mapname: <mapname>,
+  x: <x>,
+  y: <y>,
+  id: <id>,
+  variation: <variation>,
+  name: <name>,
+  actions: <actioncount>,
+  weapon: <id>,
+  armor: <id>,
+  health: <health>, #might not be present
+  maxhealth: <health>, #might not be present
+  inventory: [<id>], #might not be present
+}
+
+<prop>:
+{
+  mapname: <mapname>
+  x: x,
+  y: y,
+  variation: <variation>,
+  collide: <collide>,
+}
+#<collide> :: boolean, false if the position is walkable
+
+<item>:
+{
+  id: <id>,
+  name: <name>,
+  type: <itemtype>,
+  variation: <variation>,
+  description: <itemdescription>,
+}
+
+#<mapname> :: string, a unique name of the map, may be shown to players
+#<x>, <y> :: int, tile coordinate
+#<actioncount> :: int, num of actions this particular tick
+#<id> :: string, no two things of the same type (i.e. <character> or <item>) may have the same
+#<name> :: string, a name to show to players, no unique guarantee
+#<health> :: int, a number representing hitpoints
+#<itemtype> :: string, "weapon" | "armor" | "use" | "nouse"
+#<variation> :: int, selects a display variation to render
+#<itemdescription> :: string, a description to show the players
