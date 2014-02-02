@@ -37,7 +37,8 @@ func main() {
 		Inventory: nil,
 		viewDist:  11,
 	}
-	maps["testmap"] = parseMap("testmap.png")
+
+	world = loadWorld(".")
 
 	//Things that will stay
 	go otm.Listen()
@@ -54,11 +55,7 @@ func main() {
 }
 
 var (
-	itemData   = make(map[string]ItemData)
-	characters = make(map[string]*Character)
-	items      = make(map[string][]Item)
-	props      = make(map[string][]Prop)
-	maps       = make(map[string][][]bits)
+	world *World
 )
 
 type Item struct {
@@ -74,8 +71,7 @@ type Prop struct {
 	Collide   bool `json:"collide"`
 }
 
-type ItemData struct {
-	Id          string `json:"id"`
+type ItemBlueprint struct {
 	Name        string `json:"name"`
 	Type        string `json:"type"`
 	Variation   string `json:"variation"`

@@ -32,7 +32,7 @@
 }
 
 {
-  command: "itemrequest",
+  command: "blueprintrequest",
   id: <id>,
 }
 
@@ -63,23 +63,23 @@
   maps: {
     <mapname>: [
       {
-        x: <x>
-        y: <y>
-        data: <bits>
+        x: <x>,
+        y: <y>,
+        data: <bits>,
       }
-    ]
+    ],
   },
   controllable: [<id>],
   characters: [<character>],
   props: {
     <mapname>: [<prop>],
-  }
+  },
   items: {
     <mapname>: {
       x: <x>,
       y: <y>,
-      id: <id>
-    }
+      id: <bid>,
+    },
   },
   updates: [<update>],
 }
@@ -101,7 +101,16 @@ or
 or
 {
   damage: <damage>,
-  dealer: <id>, #not present if world damage
+  dealer: <id>, #may not be present
+  target: <id>,
+}
+or
+{
+  damage: <damage>,
+  origin: {
+    x: <x>,
+    y: <y>,
+  },
   target: <id>,
 }
 
@@ -114,11 +123,11 @@ or
   variation: <variation>,
   name: <name>,
   actions: <actioncount>,
-  weapon: <id>,
-  armor: <id>,
+  weapon: <bid>,
+  armor: <bid>,
   health: <health>, #might not be present
   maxhealth: <health>, #might not be present
-  inventory: [<id>], #might not be present
+  inventory: [<bid>], #might not be present
 }
 
 <prop>:
@@ -131,7 +140,7 @@ or
 }
 #<collide> :: boolean, false if the position is walkable
 
-<item>:
+<itemblueprint>:
 {
   id: <id>,
   name: <name>,
@@ -144,6 +153,7 @@ or
 #<x>, <y> :: int, tile coordinate
 #<actioncount> :: int, num of actions this particular tick
 #<id> :: string, no two things of the same type (i.e. <character> or <item>) may have the same
+#<bid> :: string, an identifier of an item blueprint id. Multiple things may use the same bid.
 #<name> :: string, a name to show to players, no unique guarantee
 #<health> :: int, a number representing hitpoints
 #<itemtype> :: string, "weapon" | "armor" | "use" | "nouse"

@@ -72,9 +72,3 @@ func parseMap(path string) [][]bits {
 
 	return m
 }
-
-func d(err error) {
-	if err != nil {
-		panic(err)
-	}
-}

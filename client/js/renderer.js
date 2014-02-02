@@ -88,7 +88,7 @@ function renderer(model) {
 
   function drawItems() {
     model.items.forEach(function(itempos) {
-      if (!model.itemdb[itempos.id])
+      if (!model.blueprints[itempos.id])
         drawFromTileset({x: 5, y: 6}, itempos)
     })
   }

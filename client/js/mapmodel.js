@@ -3,19 +3,19 @@ function mapmodel() {
   var SETID = (1 << 4) - 1
   var VARIATION = ((1 << 4) - 1) << 4
 
-  var data = {maps: {}, visible: [], itemdata: {}, selectedId: ""}
+  var data = {maps: {}, visible: [], blueprints: {}, selectedId: ""}
 
   if (localStorage.maps) {
     data.maps = JSON.parse(localStorage.maps)
-    data.itemdata = JSON.parse(localStorage.itemdata)
+    data.blueprints = JSON.parse(localStorage.blueprints)
   }
 
   data.onbeforeunload = function(e) {
     localStorage.maps = JSON.stringify(data.maps)
-    localStorage.itemdata = JSON.stringify(data.itemdata)
+    localStorage.blueprints = JSON.stringify(data.blueprints)
   }
 
-  setpos = function(mapname, pos) {
+  function setpos(mapname, pos) {
     if (!data.maps[mapname])
       data.maps[mapname] = []
 
@@ -31,7 +31,7 @@ function mapmodel() {
   }
 
   function ensure(id, send) {
-    if (data.itemdata[id] || !id)
+    if (data.blueprints[id] || !id)
       return
 
     send({
@@ -75,7 +75,7 @@ function mapmodel() {
   }
 
   data.itemUpdate = function(update, net) {
-    data.itemdata[update.id] = update
+    data.blueprints[update.id] = update
   }
 
   function clearVisible() {
