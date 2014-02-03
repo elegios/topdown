@@ -10,8 +10,13 @@ const (
 	MAPS_FOLDER    = "maps"
 	LIVE_FOLDER    = "live"
 	INITIAL_FOLDER = "livestart"
-	EXTRA_EXT      = ".ext"
-	MAP_EXT        = ".png"
+
+	CHARACTER_FILE = "characters"
+
+	EXTRA_EXT = ".ext"
+	MAP_EXT   = ".png"
+	ITEM_EXT  = ".ite"
+	PROP_EXT  = ".prp"
 )
 
 type World struct {
@@ -33,7 +38,9 @@ func loadWorld(root string) *World {
 		maps:           make(map[string][][]bits),
 	}
 	w.mapRoot = filepath.Join(root, CONST_FOLDER, MAPS_FOLDER)
-	w.liveRoot = filepath.Join(root, LIVE_FOLDER)
+	w.liveRoot = filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER)
+
+	filepath.Walk(w.mapRoot, w.loadMapData)
 
 	liveRoot := w.liveRoot
 	if _, err := os.Stat(w.liveRoot); os.IsNotExist(err) {
@@ -42,7 +49,7 @@ func loadWorld(root string) *World {
 	filepath.Walk(w.liveRoot, w.loadLiveData)
 	w.liveRoot = liveRoot
 
-	filepath.Walk(w.mapRoot, w.loadMapData)
+	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE)) //This is going to be huge, same goes for the in memory structure, might want to rethink something here
 
 	return w
 }
@@ -80,7 +87,33 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 	if info.IsDir() {
 		return nil
 	}
-	//TODO
+
+	name := getName(w.liveRoot, path)
+
+	switch filepath.Ext(path) {
+	case ITEM_EXT:
+		return loadItems(path, name)
+
+	case PROP_EXT:
+		return loadProps(path, name)
+
+	default:
+		return nil
+	}
+}
+
+func (w *World) loadItems(path, mapname string) error {
+
+	return nil
+}
+
+func (w *World) loadProps(path, mapname string) error {
+
+	return nil
+}
+
+func (w *World) loadCharacters(path string) {
+
 	return nil
 }
 
