@@ -19,11 +19,18 @@ const (
 	PROP_EXT  = ".prp"
 )
 
+type Position struct {
+	mapid string
+	x     int
+	y     int
+}
+
 type World struct {
 	itemBlueprints map[string]ItemBlueprint
-	characters     map[string]*Character
-	items          map[string][]Item
-	props          map[string][]Prop
+	charids        map[string]*Character
+	mapCharacters  map[Position]*Character
+	mapItems       map[Position]Item
+	mapProps       map[Position]Prop
 	maps           map[string][][]bits
 	mapRoot        string
 	liveRoot       string
@@ -32,9 +39,10 @@ type World struct {
 func loadWorld(root string) *World {
 	w := &World{
 		itemBlueprints: make(map[string]ItemBlueprint),
-		characters:     make(map[string]*Character),
-		items:          make(map[string][]Item),
-		props:          make(map[string][]Prop),
+		charids:        make(map[string]*Character),
+		mapCharacters:  make(map[Position]*Character),
+		mapItems:       make(map[Position]Item),
+		mapProps:       make(map[Position]Prop),
 		maps:           make(map[string][][]bits),
 	}
 	w.mapRoot = filepath.Join(root, CONST_FOLDER, MAPS_FOLDER)
@@ -49,7 +57,7 @@ func loadWorld(root string) *World {
 	filepath.Walk(w.liveRoot, w.loadLiveData)
 	w.liveRoot = liveRoot
 
-	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE)) //This is going to be huge, same goes for the in memory structure, might want to rethink something here
+	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE))
 
 	return w
 }
@@ -92,10 +100,10 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 
 	switch filepath.Ext(path) {
 	case ITEM_EXT:
-		return loadItems(path, name)
+		return w.loadItems(path, name)
 
 	case PROP_EXT:
-		return loadProps(path, name)
+		return w.loadProps(path, name)
 
 	default:
 		return nil
@@ -112,7 +120,7 @@ func (w *World) loadProps(path, mapname string) error {
 	return nil
 }
 
-func (w *World) loadCharacters(path string) {
+func (w *World) loadCharacters(path string) error {
 
 	return nil
 }

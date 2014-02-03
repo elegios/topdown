@@ -45,31 +45,30 @@ func blueprintRequest(ch chan map[string]string, id string) {
 func create(ch chan map[string]string, name string) {
 	b := make([]byte, idlength)
 	var id string
-	for inUse := true; inUse; _, inUse = world.characters[id] {
+	for inUse := true; inUse; _, inUse = world.charids[id] {
 		rand.Read(b)
 		id = base64.StdEncoding.EncodeToString(b)
 	}
 	c := defaultCharacter
 	c.Id = id
 	c.Name = name
-	world.characters[id] = &c
+	world.charids[id] = &c
+	world.mapCharacters[c.getPosition()] = &c
 	ch <- map[string]string{"id": id}
 }
 
 func pickup(charId string) {
-	c := world.characters[charId]
-	if c == nil || c.Actions < 1 {
+	c, ok := world.charids[charId]
+	if !ok || c.Actions < 1 {
 		return
 	}
-	for i, item := range world.items[c.Mapname] {
-		if item.X == c.X && item.Y == c.Y {
-			world.items[c.Mapname][i] = world.items[c.Mapname][len(world.items[c.Mapname])-1]
-			world.items[c.Mapname] = world.items[c.Mapname][:len(world.items[c.Mapname])-1]
-			c.Inventory = append(c.Inventory, item.Id)
-			c.Actions--
-			return
-		}
+	item, ok := world.mapItems[c.getPosition()]
+	if !ok {
+		return
 	}
+	delete(world.mapItems, c.getPosition())
+	c.Inventory = append(c.Inventory, item.Id)
+	c.Actions--
 }
 
 func useItem(charId, action, itemId string) {
@@ -77,8 +76,8 @@ func useItem(charId, action, itemId string) {
 }
 
 func move(charId, direction string) {
-	c := world.characters[charId]
-	if c == nil || c.Actions < 1 {
+	c, ok := world.charids[charId]
+	if !ok || c.Actions < 1 {
 		return
 	}
 	xMod := c.X
@@ -102,27 +101,27 @@ func move(charId, direction string) {
 	if world.maps[c.Mapname][yMod][xMod].collides() {
 		return
 	}
-	for _, c2 := range world.characters {
-		if c.Mapname == c2.Mapname && c2.X == xMod && c2.Y == yMod {
-			//TODO: attack
-			return
-		}
+	pos := Position{c.Mapname, xMod, yMod}
+	if _, ok := world.mapCharacters[pos]; ok {
+		//TODO: attack
+		return
 	}
-	for _, p := range world.props[c.Mapname] {
-		if p.Collide && p.X == xMod && p.Y == yMod {
-			//TODO: check if something special should happen
-			return
-		}
+	if p, ok := world.mapProps[pos]; ok && p.Collide {
+		//TODO: check if something special should happen
+		return
 	}
 	c.Actions--
+	delete(world.mapCharacters, c.getPosition())
 	c.X = xMod
 	c.Y = yMod
+	world.mapCharacters[c.getPosition()] = c
 }
 
 func tick() {
-	for _, c := range world.characters {
+	for _, c := range world.charids {
 		if c.Health <= 0 {
-			delete(world.characters, c.Id)
+			delete(world.charids, c.Id)
+			delete(world.mapCharacters, c.getPosition())
 			continue
 		}
 

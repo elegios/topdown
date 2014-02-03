@@ -18,20 +18,6 @@ type clientData struct {
 	sync.Mutex
 }
 
-type mapPos struct {
-	X    int  `json:"x"`
-	Y    int  `json:"y"`
-	Data bits `json:"data"`
-}
-
-type tickUpdate struct {
-	Maps         map[string][]mapPos `json:"maps"`
-	Controllable []string            `json:"controllable"`
-	Characters   []*Character        `json:"characters"`
-	Props        []Prop              `json:"props"`
-	Items        []Item              `json:"items"`
-}
-
 type request struct {
 	message map[string]string
 	ch      chan map[string]string
