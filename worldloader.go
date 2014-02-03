@@ -19,12 +19,6 @@ const (
 	PROP_EXT  = ".prp"
 )
 
-type Position struct {
-	mapid string
-	x     int
-	y     int
-}
-
 type World struct {
 	itemBlueprints map[string]ItemBlueprint
 	charids        map[string]*Character

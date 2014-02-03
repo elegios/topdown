@@ -68,13 +68,13 @@ func collectMapPos(update *tickUpdate) {
 		maxJ := min(char.Y+char.viewDist, len(world.maps[char.Mapname])-1)
 		maxI := min(char.X+char.viewDist, len(world.maps[char.Mapname][0])-1)
 		pos := Position{
-			mapid: char.Mapname,
+			Mapid: char.Mapname,
 		}
 		for ; j <= maxJ; j++ {
-			pos.y = j
+			pos.Y = j
 			i := max(char.X-char.viewDist, 0)
 			for ; i <= maxI; i++ {
-				pos.x = i
+				pos.X = i
 				if update.positions[pos] ||
 					(j-char.Y)*(j-char.Y)+(i-char.X)*(i-char.X) > char.viewDist*char.viewDist+1 ||
 					!visible(world.maps[char.Mapname], char.X, char.Y, i, j) {
@@ -85,7 +85,7 @@ func collectMapPos(update *tickUpdate) {
 		}
 	}
 	for pos := range update.positions {
-		update.Maps[pos.mapid] = append(update.Maps[pos.mapid], mapPos{pos.x, pos.y, world.maps[pos.mapid][pos.y][pos.x]})
+		update.Maps[pos.Mapid] = append(update.Maps[pos.Mapid], pos.getMapPos(world.maps[pos.Mapid]))
 	}
 }
 
