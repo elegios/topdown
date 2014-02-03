@@ -1,15 +1,14 @@
-package main
+package core
 
 import (
-	"crypto/rand"
-	"encoding/base64"
-	"log"
+	"github.com/elegios/topdown/server/helpers"
+	"github.com/elegios/topdown/server/types"
 )
 
-func Center(ch <-chan request) {
+func center(ch <-chan request) {
 	for req := range ch {
 		c := req.message
-		log.Println("Got a command:", c)
+		slog.Println("Got a command:", c)
 		switch c["command"] {
 		case "blueprintrequest":
 			blueprintRequest(req.ch, c["id"])
@@ -35,44 +34,41 @@ func Center(ch <-chan request) {
 func blueprintRequest(ch chan map[string]string, id string) {
 	ch <- map[string]string{
 		"id":          id,
-		"name":        world.itemBlueprints[id].Name,
-		"type":        world.itemBlueprints[id].Type,
-		"variation":   world.itemBlueprints[id].Variation,
-		"description": world.itemBlueprints[id].Description,
+		"name":        world.ItemBlueprints[id].Name,
+		"type":        world.ItemBlueprints[id].Type,
+		"variation":   world.ItemBlueprints[id].Variation,
+		"description": world.ItemBlueprints[id].Description,
 	}
 }
 
 func create(ch chan map[string]string, name string) {
-	b := make([]byte, idlength)
-	var id string
-	for inUse := true; inUse; _, inUse = world.charids[id] {
-		rand.Read(b)
-		id = base64.StdEncoding.EncodeToString(b)
-	}
 	c := defaultCharacter
-	c.Id = id
+	c.Id = helpers.NewId(func(id string) bool {
+		_, ok := world.Charids[id]
+		return ok
+	})
 	c.Name = name
-	world.charids[id] = &c
-	world.mapCharacters[c.getPosition()] = &c
-	ch <- map[string]string{"id": id}
+	world.Charids[c.Id] = &c
+	world.MapCharacters[c.GetPosition()] = &c
+	ch <- map[string]string{"id": c.Id}
 }
 
 func pickup(charId string) {
-	c, ok := world.charids[charId]
+	c, ok := world.Charids[charId]
 	if !ok || c.Actions < 1 {
 		return
 	}
-	item, ok := world.mapItems[c.getPosition()]
+	item, ok := world.MapItems[c.GetPosition()]
 	if !ok {
 		return
 	}
-	delete(world.mapItems, c.getPosition())
+	delete(world.MapItems, c.GetPosition())
 	c.Inventory = append(c.Inventory, item.Id)
 	c.Actions--
 }
 
 func useItem(charId, action, blueprintId string) {
-	c, ok := world.charids[charId]
+	c, ok := world.Charids[charId]
 	if !ok || c.Actions < 1 {
 		return
 	}
@@ -92,7 +88,7 @@ func useItem(charId, action, blueprintId string) {
 }
 
 func move(charId, direction string) {
-	c, ok := world.charids[charId]
+	c, ok := world.Charids[charId]
 	if !ok || c.Actions < 1 {
 		return
 	}
@@ -111,33 +107,33 @@ func move(charId, direction string) {
 		//TODO: changing maps
 		return
 	}
-	if yMod < 0 || xMod < 0 || yMod >= len(world.maps[c.Mapname]) || xMod >= len(world.maps[c.Mapname][yMod]) {
+	if yMod < 0 || xMod < 0 || yMod >= len(world.Maps[c.Mapname]) || xMod >= len(world.Maps[c.Mapname][yMod]) {
 		return
 	}
-	if world.maps[c.Mapname][yMod][xMod].collides() {
+	if world.Maps[c.Mapname][yMod][xMod].Collides() {
 		return
 	}
-	pos := Position{c.Mapname, xMod, yMod}
-	if _, ok := world.mapCharacters[pos]; ok {
+	pos := types.Position{c.Mapname, xMod, yMod}
+	if _, ok := world.MapCharacters[pos]; ok {
 		//TODO: attack
 		return
 	}
-	if p, ok := world.mapProps[pos]; ok && p.Collide {
+	if p, ok := world.MapProps[pos]; ok && p.Collide {
 		//TODO: check if something special should happen
 		return
 	}
 	c.Actions--
-	delete(world.mapCharacters, c.getPosition())
+	delete(world.MapCharacters, c.GetPosition())
 	c.X = xMod
 	c.Y = yMod
-	world.mapCharacters[c.getPosition()] = c
+	world.MapCharacters[c.GetPosition()] = c
 }
 
 func tick() {
-	for _, c := range world.charids {
+	for _, c := range world.Charids {
 		if c.Health <= 0 {
-			delete(world.charids, c.Id)
-			delete(world.mapCharacters, c.getPosition())
+			delete(world.Charids, c.Id)
+			delete(world.MapCharacters, c.GetPosition())
 			continue
 		}
 
@@ -147,5 +143,5 @@ func tick() {
 	otm.In <- struct{}{}
 	otm.Add(1)
 	otm.Wait()
-	log.Print("Tick is done")
+	slog.Print("Tick is done")
 }

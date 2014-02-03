@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"os"
@@ -20,27 +20,28 @@ const (
 )
 
 type World struct {
-	itemBlueprints map[string]ItemBlueprint
-	charids        map[string]*Character
-	mapCharacters  map[Position]*Character
-	mapItems       map[Position]Item
-	mapProps       map[Position]Prop
-	maps           map[string][][]bits
+	ItemBlueprints map[string]ItemBlueprint
+	Charids        map[string]*Character
+	MapCharacters  map[Position]*Character
+	MapItems       map[Position]Item
+	MapProps       map[Position]Prop
+	Maps           map[string][][]Bits
 	mapRoot        string
 	liveRoot       string
 }
 
-func loadWorld(root string) *World {
+func LoadWorld(root string) *World {
 	w := &World{
-		itemBlueprints: make(map[string]ItemBlueprint),
-		charids:        make(map[string]*Character),
-		mapCharacters:  make(map[Position]*Character),
-		mapItems:       make(map[Position]Item),
-		mapProps:       make(map[Position]Prop),
-		maps:           make(map[string][][]bits),
+		ItemBlueprints: make(map[string]ItemBlueprint),
+		Charids:        make(map[string]*Character),
+		MapCharacters:  make(map[Position]*Character),
+		MapItems:       make(map[Position]Item),
+		MapProps:       make(map[Position]Prop),
+		Maps:           make(map[string][][]Bits),
+
+		mapRoot:  filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
+		liveRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
 	}
-	w.mapRoot = filepath.Join(root, CONST_FOLDER, MAPS_FOLDER)
-	w.liveRoot = filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER)
 
 	filepath.Walk(w.mapRoot, w.loadMapData)
 
@@ -76,7 +77,7 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 }
 
 func (w *World) loadMap(path, name string) error {
-	w.maps[name] = parseMap(path)
+	w.Maps[name] = parseMap(path)
 	return nil
 }
 

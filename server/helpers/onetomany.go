@@ -1,4 +1,4 @@
-package main
+package helpers
 
 import (
 	"code.google.com/p/go.net/websocket"
@@ -18,7 +18,7 @@ type OneToMany struct {
 	sync.WaitGroup
 }
 
-func newOneToMany() *OneToMany {
+func NewOneToMany() *OneToMany {
 	return &OneToMany{
 		In:   make(chan struct{}),
 		AddP: make(chan Pair),

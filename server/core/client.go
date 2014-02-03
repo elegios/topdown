@@ -1,8 +1,7 @@
-package main
+package core
 
 import (
 	"code.google.com/p/go.net/websocket"
-	"log"
 	"sync"
 )
 
@@ -25,6 +24,7 @@ type request struct {
 
 func clientHandler(ch chan<- request) func(*websocket.Conn) {
 	return func(conn *websocket.Conn) {
+		slog.Println("Got a websocket connection")
 		//TODO: load owned characters
 		data := &clientData{
 			charIds: make(map[string]struct{}),
@@ -35,12 +35,12 @@ func clientHandler(ch chan<- request) func(*websocket.Conn) {
 			var mess map[string]string
 			err := websocket.JSON.Receive(conn, &mess)
 			if err != nil {
-				warn.Println("A websocket connection died:", err)
+				wlog.Println("A websocket connection died:", err)
 				return
 			}
 
 			if !ok(mess, data) {
-				warn.Print("A message was not ok:", mess)
+				wlog.Print("A message was not ok:", mess)
 				continue
 			}
 
@@ -48,7 +48,7 @@ func clientHandler(ch chan<- request) func(*websocket.Conn) {
 			switch mess["command"] {
 			case "create":
 				res := <-locChan
-				log.Printf("got return from create")
+				slog.Printf("got return from create")
 				data.Lock()
 				data.charIds[res["id"]] = struct{}{}
 				data.Unlock()

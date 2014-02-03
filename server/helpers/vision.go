@@ -1,10 +1,14 @@
-package main
+package helpers
 
-func visible(bs [][]bits, x1, y1, x2, y2 int) bool {
+import (
+	"github.com/elegios/topdown/server/types"
+)
+
+func Visible(bs [][]types.Bits, x1, y1, x2, y2 int) bool {
 	if x1 == x2 && y1 == y2 {
 		return true
 	}
-	if abs(x1-x2) > abs(y1-y2) {
+	if Abs(x1-x2) > Abs(y1-y2) {
 		dir := 1
 		if x1 > x2 {
 			dir = -1
@@ -12,7 +16,7 @@ func visible(bs [][]bits, x1, y1, x2, y2 int) bool {
 		k := k(x1, y1, x2, y2)
 		m := m(x1, y1, k)
 		for i := x1 + dir; i != x2; i += dir {
-			if bs[f(k, i, m, dir)][i].blocksVision() {
+			if bs[f(k, i, m, dir)][i].BlocksVision() {
 				return false
 			}
 		}
@@ -24,7 +28,7 @@ func visible(bs [][]bits, x1, y1, x2, y2 int) bool {
 		k := k(y1, x1, y2, x2)
 		m := m(y1, x1, k)
 		for j := y1 + dir; j != y2; j += dir {
-			if bs[j][f(k, j, m, dir)].blocksVision() {
+			if bs[j][f(k, j, m, dir)].BlocksVision() {
 				return false
 			}
 		}
@@ -50,11 +54,4 @@ func f(k float32, x int, m float32, dir int) int {
 	//	return int(y) + 1
 	//}
 	return int(y)
-}
-
-func abs(a int) int {
-	if a < 0 {
-		return -a
-	}
-	return a
 }

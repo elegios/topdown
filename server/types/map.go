@@ -1,4 +1,4 @@
-package main
+package types
 
 import (
 	"image"
@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	translation = map[color.Color]bits{
+	translation = map[color.Color]Bits{
 		//blue walls
 		color.RGBA{46, 62, 95, 255}:   0x300,
 		color.RGBA{67, 92, 142, 255}:  0x310,
@@ -45,30 +45,36 @@ var (
 	}
 )
 
-type bits int
+type Bits int
 
-func (b bits) collides() bool {
+func (b Bits) Collides() bool {
 	return (b>>8)&1 == 1
 }
 
-func (b bits) blocksVision() bool {
+func (b Bits) BlocksVision() bool {
 	return (b>>9)&1 == 1
 }
 
-func parseMap(path string) [][]bits {
+func parseMap(path string) [][]Bits {
 	fi, err := os.Open(path)
 	d(err)
 
 	im, _, err := image.Decode(fi)
 	d(err)
 
-	m := make([][]bits, im.Bounds().Size().Y)
+	m := make([][]Bits, im.Bounds().Size().Y)
 	for j := im.Bounds().Min.Y; j < im.Bounds().Max.Y; j++ {
-		m[j-im.Bounds().Min.Y] = make([]bits, im.Bounds().Size().X)
+		m[j-im.Bounds().Min.Y] = make([]Bits, im.Bounds().Size().X)
 		for i := im.Bounds().Min.X; i < im.Bounds().Max.X; i++ {
 			m[j-im.Bounds().Min.Y][i-im.Bounds().Min.X] = translation[color.RGBAModel.Convert(im.At(i, j))]
 		}
 	}
 
 	return m
+}
+
+func d(err error) {
+	if err != nil {
+		panic(err)
+	}
 }
