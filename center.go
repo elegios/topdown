@@ -71,8 +71,24 @@ func pickup(charId string) {
 	c.Actions--
 }
 
-func useItem(charId, action, itemId string) {
+func useItem(charId, action, blueprintId string) {
+	c, ok := world.charids[charId]
+	if !ok || c.Actions < 1 {
+		return
+	}
+	index := -1
+	for i, id := range c.Inventory {
+		if id == blueprintId {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		return
+	}
+	c.Actions--
 	//TODO
+	return
 }
 
 func move(charId, direction string) {

@@ -33,14 +33,14 @@
 
 {
   command: "blueprintrequest",
-  id: <id>,
+  id: <bid>,
 }
 
 {
   command: "useitem",
   action: <action>,
   character: <id>,
-  item: <id>,
+  item: <bid>,
 }
 #<action> :: string, "drop" | "use"
 
