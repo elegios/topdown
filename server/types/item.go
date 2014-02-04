@@ -12,3 +12,8 @@ type ItemBlueprint struct {
 	Variation   string `json:"variation"`
 	Description string `json:"description"`
 }
+
+func (w *World) loadItems(path, mapname string) error {
+
+	return nil
+}

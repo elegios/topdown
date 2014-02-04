@@ -105,21 +105,6 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 	}
 }
 
-func (w *World) loadItems(path, mapname string) error {
-
-	return nil
-}
-
-func (w *World) loadProps(path, mapname string) error {
-
-	return nil
-}
-
-func (w *World) loadCharacters(path string) error {
-
-	return nil
-}
-
 func getName(root, path string) string {
 	name, _ := filepath.Rel(root, path)
 	name = filepath.ToSlash(name)

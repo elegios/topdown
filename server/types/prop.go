@@ -6,3 +6,8 @@ type Prop struct {
 	Variation int  `json:"variation"`
 	Collide   bool `json:"collide"`
 }
+
+func (w *World) loadProps(path, mapname string) error {
+
+	return nil
+}

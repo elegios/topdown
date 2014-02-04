@@ -20,3 +20,8 @@ type Character struct {
 func (c *Character) GetPosition() Position {
 	return Position{c.Mapname, c.X, c.Y}
 }
+
+func (w *World) loadCharacters(path string) error {
+
+	return nil
+}
