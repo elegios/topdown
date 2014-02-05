@@ -29,7 +29,7 @@ func Load(root string) {
 	world = types.LoadWorld(root)
 }
 
-func Start(fspath, websocketpath, clientdir string) {
+func Start(fspath, wspath, clientdir string) {
 	defaultCharacter = types.Character{
 		Mapname:   "testmap",
 		X:         5,
@@ -51,6 +51,8 @@ func Start(fspath, websocketpath, clientdir string) {
 	go otm.Listen()
 	go center(ch)
 
-	http.Handle(websocketpath, websocket.Handler(clientHandler(ch)))
+	http.Handle(wspath, websocket.Handler(clientHandler(ch)))
 	http.Handle(fspath, http.FileServer(http.Dir(clientdir)))
+
+	slog.Printf("Core has started. clientDir: %#v, wspath: %#v, fspath: %#v\n", clientdir, wspath, fspath)
 }

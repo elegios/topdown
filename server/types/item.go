@@ -13,7 +13,32 @@ type ItemBlueprint struct {
 	Description string `json:"description"`
 }
 
-func (w *World) loadItems(path, mapname string) error {
+func (w *World) loadItems(path, mapname string) (err error) {
+	var items []Item
+	err = dec(path, &items)
+	if err != nil {
+		return
+	}
 
-	return nil
+	for _, item := range items {
+		w.MapItems[Position{mapname, item.X, item.Y}] = item
+	}
+
+	return
+}
+
+func (w *World) saveItems(root string) (err error) {
+	items := make(map[string][]Item)
+	for pos, item := range w.MapItems {
+		items[pos.Mapid] = append(items[pos.Mapid], item)
+	}
+
+	for name, itemlist := range items {
+		err = enc(getPath(root, name, ITEM_EXT), itemlist)
+		if err != nil {
+			return
+		}
+	}
+
+	return
 }

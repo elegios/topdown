@@ -5,6 +5,7 @@ import (
 	"image/color"
 	_ "image/png"
 	"os"
+	"path/filepath"
 )
 
 var (
@@ -55,9 +56,21 @@ func (b Bits) BlocksVision() bool {
 	return (b>>9)&1 == 1
 }
 
+func getName(root, path string) string {
+	name, _ := filepath.Rel(root, path)
+	name = filepath.ToSlash(name)
+	name = name[:len(name)-len(filepath.Ext(name))]
+	return name
+}
+
+func getPath(root, name, ext string) string {
+	return filepath.Join(root, filepath.FromSlash(name)+ext)
+}
+
 func parseMap(path string) [][]Bits {
 	fi, err := os.Open(path)
 	d(err)
+	defer fi.Close()
 
 	im, _, err := image.Decode(fi)
 	d(err)
@@ -71,6 +84,10 @@ func parseMap(path string) [][]Bits {
 	}
 
 	return m
+}
+func (w *World) loadMap(path, name string) error {
+	w.Maps[name] = parseMap(path)
+	return nil
 }
 
 func d(err error) {

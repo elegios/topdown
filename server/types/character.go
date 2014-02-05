@@ -21,7 +21,19 @@ func (c *Character) GetPosition() Position {
 	return Position{c.Mapname, c.X, c.Y}
 }
 
-func (w *World) loadCharacters(path string) error {
+func (w *World) loadCharacters(path string) (err error) {
+	err = dec(path, &w.Charids)
+	if err != nil {
+		return
+	}
 
-	return nil
+	for _, c := range w.Charids {
+		w.MapCharacters[c.GetPosition()] = c
+	}
+
+	return
+}
+
+func (w *World) saveCharacters(path string) error {
+	return enc(path, w.Charids)
 }

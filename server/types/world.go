@@ -27,6 +27,7 @@ type World struct {
 	MapProps       map[Position]Prop
 	Maps           map[string][][]Bits
 	mapRoot        string
+	liveMapRoot    string
 	liveRoot       string
 }
 
@@ -39,18 +40,19 @@ func LoadWorld(root string) *World {
 		MapProps:       make(map[Position]Prop),
 		Maps:           make(map[string][][]Bits),
 
-		mapRoot:  filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
-		liveRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
+		mapRoot:     filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
+		liveMapRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
+		liveRoot:    filepath.Join(root, LIVE_FOLDER),
 	}
 
 	filepath.Walk(w.mapRoot, w.loadMapData)
 
-	liveRoot := w.liveRoot
+	liveMapRoot := w.liveMapRoot
 	if _, err := os.Stat(w.liveRoot); os.IsNotExist(err) {
-		w.liveRoot = filepath.Join(root, CONST_FOLDER, INITIAL_FOLDER)
+		w.liveMapRoot = filepath.Join(root, CONST_FOLDER, INITIAL_FOLDER, MAPS_FOLDER)
 	}
-	filepath.Walk(w.liveRoot, w.loadLiveData)
-	w.liveRoot = liveRoot
+	filepath.Walk(w.liveMapRoot, w.loadLiveData)
+	w.liveMapRoot = liveMapRoot
 
 	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE))
 
@@ -76,11 +78,6 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 	}
 }
 
-func (w *World) loadMap(path, name string) error {
-	w.Maps[name] = parseMap(path)
-	return nil
-}
-
 func (w *World) loadMapExtra(path, name string) error {
 	//TODO
 	return nil
@@ -91,7 +88,7 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 		return nil
 	}
 
-	name := getName(w.liveRoot, path)
+	name := getName(w.liveMapRoot, path)
 
 	switch filepath.Ext(path) {
 	case ITEM_EXT:
@@ -105,9 +102,8 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 	}
 }
 
-func getName(root, path string) string {
-	name, _ := filepath.Rel(root, path)
-	name = filepath.ToSlash(name)
-	name = name[:len(name)-len(filepath.Ext(name))]
-	return name
+func (w *World) SaveWorld() {
+	w.saveCharacters(filepath.Join(w.liveRoot, CHARACTER_FILE))
+	w.saveItems(w.liveMapRoot)
+	w.saveProps(w.liveMapRoot)
 }
