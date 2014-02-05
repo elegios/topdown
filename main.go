@@ -16,5 +16,6 @@ const (
 func main() {
 	core.Load(rootdir)
 	core.Start(fspath, websocketpath, clientdir)
+	go core.CliControl()
 	http.ListenAndServe(host, nil)
 }

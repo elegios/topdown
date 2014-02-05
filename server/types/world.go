@@ -33,19 +33,17 @@ type World struct {
 
 func LoadWorld(root string) *World {
 	w := &World{
-		ItemBlueprints: make(map[string]ItemBlueprint),
-		Charids:        make(map[string]*Character),
-		MapCharacters:  make(map[Position]*Character),
-		MapItems:       make(map[Position]Item),
-		MapProps:       make(map[Position]Prop),
-		Maps:           make(map[string][][]Bits),
+		Charids:       make(map[string]*Character),
+		MapCharacters: make(map[Position]*Character),
+		MapItems:      make(map[Position]Item),
+		MapProps:      make(map[Position]Prop),
 
 		mapRoot:     filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
 		liveMapRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
 		liveRoot:    filepath.Join(root, LIVE_FOLDER),
 	}
 
-	filepath.Walk(w.mapRoot, w.loadMapData)
+	w.LoadConstantWorld()
 
 	liveMapRoot := w.liveMapRoot
 	if _, err := os.Stat(w.liveRoot); os.IsNotExist(err) {
@@ -57,6 +55,13 @@ func LoadWorld(root string) *World {
 	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE))
 
 	return w
+}
+
+func (w *World) LoadConstantWorld() error {
+	w.ItemBlueprints = make(map[string]ItemBlueprint)
+	w.Maps = make(map[string][][]Bits)
+
+	return filepath.Walk(w.mapRoot, w.loadMapData)
 }
 
 func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
