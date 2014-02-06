@@ -35,7 +35,7 @@ function mapmodel() {
       return
 
     send({
-      command: "itemrequest",
+      command: "blueprintrequest",
       id: id,
     })
   }
@@ -64,7 +64,7 @@ function mapmodel() {
         return
 
       character.inventory.forEach(function(item) {
-        ensure(item.id, send)
+        ensure(item, send)
       })
     })
     data.items.forEach(function(item) {

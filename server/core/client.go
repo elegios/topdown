@@ -19,7 +19,7 @@ type clientData struct {
 
 type request struct {
 	message map[string]string
-	ch      chan map[string]string
+	ch      chan map[string]interface{}
 }
 
 func clientHandler(ch chan<- request) func(*websocket.Conn) {
@@ -30,7 +30,7 @@ func clientHandler(ch chan<- request) func(*websocket.Conn) {
 			charIds: make(map[string]struct{}),
 		}
 		go sendTicks(conn, data)
-		locChan := make(chan map[string]string, 1)
+		locChan := make(chan map[string]interface{}, 1)
 		for {
 			var mess map[string]string
 			err := websocket.JSON.Receive(conn, &mess)
@@ -50,11 +50,12 @@ func clientHandler(ch chan<- request) func(*websocket.Conn) {
 				res := <-locChan
 				slog.Printf("got return from create")
 				data.Lock()
-				data.charIds[res["id"]] = struct{}{}
+				data.charIds[res["id"].(string)] = struct{}{}
 				data.Unlock()
 
-			case "itemrequest":
+			case "blueprintrequest":
 				websocket.JSON.Send(conn, <-locChan)
+				slog.Println("got return from blueprintrequest")
 			}
 		}
 	}

@@ -43,7 +43,7 @@ func LoadWorld(root string) *World {
 		liveRoot:    filepath.Join(root, LIVE_FOLDER),
 	}
 
-	w.LoadConstantWorld()
+	d(w.LoadConstantWorld())
 
 	liveMapRoot := w.liveMapRoot
 	if _, err := os.Stat(w.liveRoot); os.IsNotExist(err) {

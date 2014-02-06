@@ -31,8 +31,8 @@ func center(ch <-chan request) {
 	}
 }
 
-func blueprintRequest(ch chan map[string]string, id string) {
-	ch <- map[string]string{
+func blueprintRequest(ch chan map[string]interface{}, id string) {
+	ch <- map[string]interface{}{
 		"id":          id,
 		"name":        world.ItemBlueprints[id].Name,
 		"type":        world.ItemBlueprints[id].Type,
@@ -41,7 +41,7 @@ func blueprintRequest(ch chan map[string]string, id string) {
 	}
 }
 
-func create(ch chan map[string]string, name string) {
+func create(ch chan map[string]interface{}, name string) {
 	c := defaultCharacter
 	c.Id = helpers.NewId(func(id string) bool {
 		_, ok := world.Charids[id]
@@ -50,7 +50,7 @@ func create(ch chan map[string]string, name string) {
 	c.Name = name
 	world.Charids[c.Id] = &c
 	world.MapCharacters[c.GetPosition()] = &c
-	ch <- map[string]string{"id": c.Id}
+	ch <- map[string]interface{}{"id": c.Id}
 }
 
 func pickup(charId string) {
