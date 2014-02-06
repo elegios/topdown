@@ -1,0 +1,4 @@
+itemb "pot" "Potion of Awesome" "potion" 0 "It is awesome" {
+	nudge health -1
+	remove pot
+}

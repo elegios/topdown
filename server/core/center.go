@@ -48,6 +48,7 @@ func create(ch chan map[string]interface{}, name string) {
 		return ok
 	})
 	c.Name = name
+	c.Inventory = []string{"pot"}
 	world.Charids[c.Id] = &c
 	world.MapCharacters[c.GetPosition()] = &c
 	ch <- map[string]interface{}{"id": c.Id}
@@ -82,8 +83,9 @@ func useItem(charId, action, blueprintId string) {
 	if index == -1 {
 		return
 	}
+	slog.Println("used an item")
 	c.Actions--
-	//TODO
+	world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
 	return
 }
 

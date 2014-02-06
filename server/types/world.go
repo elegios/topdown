@@ -19,6 +19,10 @@ const (
 	PROP_EXT  = ".prp"
 )
 
+type VM interface {
+	RunConstantScript(path string, world *World) error
+}
+
 type World struct {
 	ItemBlueprints map[string]ItemBlueprint
 	Charids        map[string]*Character
@@ -29,9 +33,10 @@ type World struct {
 	mapRoot        string
 	liveMapRoot    string
 	liveRoot       string
+	vm             VM
 }
 
-func LoadWorld(root string) *World {
+func LoadWorld(vm VM, root string) *World {
 	w := &World{
 		Charids:       make(map[string]*Character),
 		MapCharacters: make(map[Position]*Character),
@@ -41,6 +46,8 @@ func LoadWorld(root string) *World {
 		mapRoot:     filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
 		liveMapRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
 		liveRoot:    filepath.Join(root, LIVE_FOLDER),
+
+		vm: vm,
 	}
 
 	d(w.LoadConstantWorld())
@@ -85,7 +92,7 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 
 func (w *World) loadMapExtra(path, name string) error {
 	//TODO
-	return nil
+	return w.vm.RunConstantScript(path, w)
 }
 
 func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {

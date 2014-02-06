@@ -3,6 +3,7 @@ package core
 import (
 	"code.google.com/p/go.net/websocket"
 	"github.com/elegios/topdown/server/helpers"
+	"github.com/elegios/topdown/server/script"
 	"github.com/elegios/topdown/server/types"
 	"log"
 	"net/http"
@@ -22,11 +23,18 @@ var (
 	otm = helpers.NewOneToMany()
 
 	world            *types.World
+	vm               *script.VM
 	defaultCharacter types.Character
 )
 
 func Load(root string) {
-	world = types.LoadWorld(root)
+	vm = script.CreateVM()
+	world = types.LoadWorld(vm, root)
+
+	slog.Println("Got maps:")
+	for name := range world.Maps {
+		slog.Println(name)
+	}
 }
 
 func Start(fspath, wspath, clientdir string) {

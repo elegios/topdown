@@ -1,5 +1,9 @@
 package types
 
+type CharacterRunnable interface {
+	RunOn(origin, target *Character)
+}
+
 type Item struct {
 	X  int    `json:"x"`
 	Y  int    `json:"y"`
@@ -7,10 +11,11 @@ type Item struct {
 }
 
 type ItemBlueprint struct {
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	Variation   string `json:"variation"`
-	Description string `json:"description"`
+	Name        string            `json:"name"`
+	Type        string            `json:"type"`
+	Variation   int               `json:"variation"`
+	Description string            `json:"description"`
+	Effect      CharacterRunnable `json:"-"`
 }
 
 func (w *World) loadItems(path, mapname string) (err error) {
