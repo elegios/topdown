@@ -13,35 +13,101 @@ type itemRunner struct {
 }
 
 func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
-	if argc != 6 {
-		gelo.ArgumentError(vm, "itemb", "string string string int string code", args)
+	if argc > 1 {
+		gelo.ArgumentError(vm, "itemb", "[properties]", args)
 	}
 
-	iid := vm.API.SymbolOrElse(args.Value).String()
-	args = args.Next
-	iname := vm.API.SymbolOrElse(args.Value).String()
-	args = args.Next
-	itype := vm.API.SymbolOrElse(args.Value).String()
-	args = args.Next
-	ivariation, _ := vm.API.NumberOrElse(args.Value).Int()
-	args = args.Next
-	idescription := vm.API.SymbolOrElse(args.Value).String()
-	args = args.Next
-	icode := vm.API.QuoteOrElse(args.Value)
-
-	w.ItemBlueprints[iid] = types.ItemBlueprint{
-		Name:        iname,
-		Type:        itype,
-		Variation:   int(ivariation),
-		Description: idescription,
+	var setId, setName, setType, setVariation, setDescription, setCode bool
+	var id string
+	blueprint := types.ItemBlueprint{
 		Effect: &itemRunner{
 			world: (*types.World)(w),
 			vm:    vm,
-			code:  icode,
 			ns:    vm.Ns.Locals(vm.Ns.Depth() - 3), // ignore the namespaces with the language and the "extraapi"
 		},
 	}
 
+	if argc == 1 {
+		lines, ok := vm.API.PartialEval(vm.API.QuoteOrElse(args.Value))
+		if !ok {
+			gelo.ArgumentError(vm, "itemb", "[properties]", args)
+		}
+		for line := lines; line != nil; line = line.Next {
+			lineList := line.Value.(*gelo.List)
+			switch vm.API.SymbolOrElse(lineList.Value).String() {
+			case "id:":
+				if setId {
+					gelo.RuntimeError(vm, "Attempted to set item id twice.")
+				}
+				id = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setId = true
+
+			case "name:":
+				if setName {
+					gelo.RuntimeError(vm, "Attempted to set item name twice.")
+				}
+				blueprint.Name = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setName = true
+
+			case "type:":
+				if setType {
+					gelo.RuntimeError(vm, "Attempted to set item type twice.")
+				}
+				blueprint.Type = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setType = true
+
+			case "variation:":
+				if setVariation {
+					gelo.RuntimeError(vm, "Attempted to set item variation twice.")
+				}
+				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
+				if !ok {
+					gelo.RuntimeError(vm, "Variation should have been an int.")
+				}
+				blueprint.Variation = int(num)
+				setVariation = true
+
+			case "description:":
+				if setDescription {
+					gelo.RuntimeError(vm, "Attempted to set item description twice.")
+				}
+				blueprint.Description = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setDescription = true
+
+			case "code:":
+				if setCode {
+					gelo.RuntimeError(vm, "Attempted to set item code twice.")
+				}
+				blueprint.Effect.(*itemRunner).code = vm.API.QuoteOrElse(lineList.Next.Value)
+				setCode = true
+			}
+		}
+	}
+
+	if !setId {
+		id = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("id"))).String()
+	}
+	if !setName {
+		blueprint.Name = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("name"))).String()
+	}
+	if !setType {
+		blueprint.Type = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("type"))).String()
+	}
+	if !setVariation {
+		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("variation"))).Int()
+		blueprint.Variation = int(num)
+		if !ok {
+			gelo.RuntimeError(vm, "Variation should have been an int")
+		}
+	}
+	if !setDescription {
+		blueprint.Description = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("description"))).String()
+	}
+	if !setCode {
+		blueprint.Effect.(*itemRunner).code = vm.API.QuoteOrElse(vm.Ns.LookupOrElse(gelo.Convert("code")))
+	}
+
+	w.ItemBlueprints[id] = blueprint
 	return gelo.Null
 }
 
