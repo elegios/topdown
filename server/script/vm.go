@@ -2,7 +2,6 @@ package script
 
 import (
 	"code.google.com/p/gelo"
-	"code.google.com/p/gelo/commands"
 	"github.com/elegios/topdown/server/types"
 	"os"
 )
@@ -12,9 +11,7 @@ type vmworld types.World
 
 func CreateVM() *VM {
 	v := gelo.NewVM(nil)
-	v.RegisterBundles([]map[string]interface{}{
-		commands.ControlCommands,
-	})
+	v.RegisterBundles(langCommands)
 	v.Ns.Fork(nil)
 	return (*VM)(v)
 }

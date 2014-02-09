@@ -38,7 +38,7 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 			world: (*types.World)(w),
 			vm:    vm,
 			code:  icode,
-			ns:    vm.Ns.Locals(vm.Ns.Depth() - 2), // ignore the namespaces with the language and the "extraapi"
+			ns:    vm.Ns.Locals(vm.Ns.Depth() - 3), // ignore the namespaces with the language and the "extraapi"
 		},
 	}
 
@@ -71,7 +71,8 @@ func (i *itemRunner) RunOn(origin, target *types.Character) {
 	}
 
 	i.vm.RegisterBundle(map[string]interface{}{
-		"nudge": vals.Nudge,
+		"nudge":  vals.Nudge,
+		"remove": vals.RemoveItem,
 	})
 
 	i.vm.SetProgram(i.code)
@@ -109,4 +110,37 @@ func (o *onAttackVals) Nudge(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word 
 	Nudge(c, val, int(amount))
 
 	return gelo.Null
+}
+
+func (o *onAttackVals) RemoveItem(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
+	if argc != 1 && argc != 2 {
+		gelo.ArgumentError(vm, "remove", "[me|target] string", args)
+	}
+	c := o.origin
+	if argc == 2 {
+		switch vm.API.SymbolOrElse(args.Value).String() {
+		case "me":
+			c = o.origin
+
+		case "target":
+			c = o.target
+			if c == nil {
+				gelo.RuntimeError(vm, "There is no target for this action.")
+			}
+
+		default:
+			gelo.ArgumentError(vm, "remove", "[me|target] string", args)
+		}
+		args = args.Next
+	}
+
+	bid := vm.API.SymbolOrElse(args.Value).String()
+	for i, item := range c.Inventory {
+		if item == bid {
+			c.Inventory[i] = c.Inventory[len(c.Inventory)-1]
+			c.Inventory = c.Inventory[:len(c.Inventory)-1]
+			return gelo.True
+		}
+	}
+	return gelo.False
 }
