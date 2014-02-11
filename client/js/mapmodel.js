@@ -67,9 +67,14 @@ function mapmodel() {
         ensure(item, send)
       })
     })
-    data.items.forEach(function(item) {
-      ensure(item.id, send)
-    })
+    for (var mapname in data.items) {
+      if (!data.items.hasOwnProperty(mapname))
+        return
+      
+      data.items[mapname].forEach(function(item) {
+        ensure(item.id, send)
+      })
+    }
     if (!data.currChar())
       data.selectedId = data.controllable[0]
   }

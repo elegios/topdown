@@ -34,9 +34,11 @@ function renderer(model) {
 
     drawTiles()
 
-    drawCharacters()
-
     drawProps()
+
+    drawItems()
+
+    drawCharacters()
 
     drawFog()
   }
@@ -72,24 +74,35 @@ function renderer(model) {
   }
 
   function drawProps() {
-    model.props.forEach(function(prop) {
-      if (prop.mapname !== data.mapname)
-        return
+    if (!model.props[data.mapname])
+      return
 
-      var tile = function() {
+    model.props[data.mapname].forEach(function(prop) {
+      var tile = (function() {
         var v = prop.variation % 25
         if (v < 15)
           return {x: v % 5, y: Math.floor(v/5) + 6}
         return {x: (v-15) % 6, y: Math.floor((v-15)/6) + 13}
-      }()
+      }())
       drawFromTileset(tile, prop)
     })
   }
 
   function drawItems() {
-    model.items.forEach(function(itempos) {
-      if (!model.blueprints[itempos.id])
+    if (!model.items[data.mapname])
+      return
+
+    model.items[data.mapname].forEach(function(itempos) {
+      if (!model.blueprints[itempos.id]) {
         drawFromTileset({x: 5, y: 6}, itempos)
+        return
+      }
+
+      switch (model.blueprints[itempos.id].type) {
+      case "potion":
+        drawFromTileset({x: 0, y: 6}, itempos)
+        return
+      }
     })
   }
 
@@ -104,7 +117,7 @@ function renderer(model) {
     context.globalAlpha = FOG_ALPHA
     context.fillStyle = "black"
     context.fillRect(0, 0, canvas.width, canvas.height)
-    context.restore()    
+    context.restore()
   }
 
   function drawTile(x, y, setid, wall, variation) {
