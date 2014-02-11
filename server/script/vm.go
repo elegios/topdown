@@ -16,11 +16,17 @@ func CreateVM() *VM {
 	return (*VM)(v)
 }
 
-func (v *VM) RunConstantScript(path string, world *types.World) (err error) {
-	vm := (*gelo.VM)(v)
-	vm.RegisterBundle(map[string]interface{}{
+func (v *VM) RunConstantScript(path string, world *types.World) error {
+	return v.runScript(path, world, map[string]interface{}{
 		"itemb": (*vmworld)(world).ItemBlueprint,
 	})
+}
+
+func (v *VM) runScript(path string, world *types.World, bundle map[string]interface{}) (err error) {
+	vm := (*gelo.VM)(v)
+	vm.Ns.Fork(nil)
+	defer vm.Ns.Unfork()
+	vm.RegisterBundle(bundle)
 	vm.Ns.Fork(nil)
 	defer vm.Ns.Unfork()
 	f, err := os.Open(path)
