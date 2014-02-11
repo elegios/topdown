@@ -13,14 +13,16 @@ const (
 
 	CHARACTER_FILE = "characters"
 
-	EXTRA_EXT = ".ext"
-	MAP_EXT   = ".png"
-	ITEM_EXT  = ".ite"
-	PROP_EXT  = ".prp"
+	CONST_SCRIPT_EXT = ".zec"
+	LIVE_SCRIPT_EXT  = ".zel"
+	MAP_EXT          = ".png"
+	ITEM_EXT         = ".ite"
+	PROP_EXT         = ".prp"
 )
 
 type VM interface {
 	RunConstantScript(path string, world *World) error
+	RunLiveScript(path string, world *World) error
 }
 
 type World struct {
@@ -82,16 +84,15 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 	case MAP_EXT:
 		return w.loadMap(path, name)
 
-	case EXTRA_EXT:
-		return w.loadMapExtra(path, name)
+	case CONST_SCRIPT_EXT:
+		return w.loadMapScript(path, name)
 
 	default:
 		return nil
 	}
 }
 
-func (w *World) loadMapExtra(path, name string) error {
-	//TODO
+func (w *World) loadMapScript(path, name string) error {
 	return w.vm.RunConstantScript(path, w)
 }
 
@@ -108,6 +109,9 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 
 	case PROP_EXT:
 		return w.loadProps(path, name)
+
+	case LIVE_SCRIPT_EXT:
+		return w.vm.RunLiveScript(path, w)
 
 	default:
 		return nil

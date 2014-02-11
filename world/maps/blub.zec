@@ -1,0 +1,26 @@
+itemb {
+	id: pot
+	name: "Potion of Awesome"
+	type: "potion"
+	variation: 0
+	description: "It is awesome"
+	code: {
+		nudge health -1
+		remove pot
+	}
+}
+let {
+	type = potion
+	description = "Heals you some"
+	code = {
+		nudge health $amount
+		remove $id
+	}
+} in {
+	foreach {
+		id        <- [list hpotmin hpotmed hpotmax]
+		variation <- [list 0 1 2]
+		name      <- [list "Minor Health Potion" "Medium Health Potion" "Major Health Potion"]
+		amount    <- [list 2 5 10]
+	} in itemb
+}

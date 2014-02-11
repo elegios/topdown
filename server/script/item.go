@@ -12,6 +12,91 @@ type itemRunner struct {
 	ns    *gelo.Dict
 }
 
+func (w *vmworld) Item(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
+	if argc > 1 {
+		gelo.ArgumentError(vm, "item", "[properties]", args)
+	}
+
+	var setId, setX, setY, setMapname bool
+	pos := types.Position{}
+	item := types.Item{}
+
+	if argc == 1 {
+		lines, ok := vm.API.PartialEval(vm.API.QuoteOrElse(args.Value))
+		if !ok {
+			gelo.ArgumentError(vm, "item", "[properties]", args)
+		}
+		for line := lines; line != nil; line = line.Next {
+			lineList := line.Value.(*gelo.List)
+			switch vm.API.SymbolOrElse(lineList.Value).String() {
+			case "id:":
+				if setId {
+					gelo.RuntimeError(vm, "Attempted to set id twice")
+				}
+				item.Id = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setId = true
+
+			case "mapname:":
+				if setMapname {
+					gelo.RuntimeError(vm, "Attempted to set mapname twice")
+				}
+				pos.Mapid = vm.API.SymbolOrElse(lineList.Next.Value).String()
+				setMapname = true
+
+			case "x:":
+				if setX {
+					gelo.RuntimeError(vm, "Attempted to set x twice")
+				}
+				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
+				if !ok {
+					gelo.TypeMismatch(vm, "int", lineList.Next.Value)
+				}
+				item.X = int(num)
+				pos.X = int(num)
+				setX = true
+
+			case "y:":
+				if setY {
+					gelo.RuntimeError(vm, "Attempted to set y twice")
+				}
+				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
+				if !ok {
+					gelo.TypeMismatch(vm, "int", lineList.Next.Value)
+				}
+				item.Y = int(num)
+				pos.Y = int(num)
+				setY = true
+			}
+		}
+	}
+
+	if !setId {
+		item.Id = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("id"))).String()
+	}
+	if !setMapname {
+		pos.Mapid = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("mapname"))).String()
+	}
+	if !setX {
+		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("x"))).Int()
+		if !ok {
+			gelo.RuntimeError(vm, "X has to be an integer")
+		}
+		pos.X = int(num)
+		item.X = int(num)
+	}
+	if !setY {
+		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("y"))).Int()
+		if !ok {
+			gelo.RuntimeError(vm, "Y has to be an integer")
+		}
+		pos.Y = int(num)
+		item.Y = int(num)
+	}
+
+	w.MapItems[pos] = item
+	return gelo.Null
+}
+
 func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
 	if argc > 1 {
 		gelo.ArgumentError(vm, "itemb", "[properties]", args)

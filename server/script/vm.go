@@ -22,6 +22,12 @@ func (v *VM) RunConstantScript(path string, world *types.World) error {
 	})
 }
 
+func (v *VM) RunLiveScript(path string, world *types.World) error {
+	return v.runScript(path, world, map[string]interface{}{
+		"item": (*vmworld)(world).Item,
+	})
+}
+
 func (v *VM) runScript(path string, world *types.World, bundle map[string]interface{}) (err error) {
 	vm := (*gelo.VM)(v)
 	vm.Ns.Fork(nil)
