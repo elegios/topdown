@@ -221,6 +221,7 @@ func (i *itemRunner) RunOn(origin, target *types.Character) {
 		world:  i.world,
 	}
 
+	i.vm.RegisterBundle(liveBundle(i.world)) //TODO: might be interesting to optimize by adding the liveBundle after const is done and then not removing it, so it doesn't have to be readded all the time.
 	i.vm.RegisterBundle(map[string]interface{}{
 		"nudge":  vals.Nudge,
 		"remove": vals.RemoveItem,

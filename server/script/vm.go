@@ -17,15 +17,21 @@ func CreateVM() *VM {
 }
 
 func (v *VM) RunConstantScript(path string, world *types.World) error {
-	return v.runScript(path, world, map[string]interface{}{
+	return v.runScript(path, world, constBundle(world))
+}
+func constBundle(world *types.World) map[string]interface{} {
+	return map[string]interface{}{
 		"itemb": (*vmworld)(world).ItemBlueprint,
-	})
+	}
 }
 
 func (v *VM) RunLiveScript(path string, world *types.World) error {
-	return v.runScript(path, world, map[string]interface{}{
+	return v.runScript(path, world, liveBundle(world))
+}
+func liveBundle(world *types.World) map[string]interface{} {
+	return map[string]interface{}{
 		"item": (*vmworld)(world).Item,
-	})
+	}
 }
 
 func (v *VM) runScript(path string, world *types.World, bundle map[string]interface{}) (err error) {

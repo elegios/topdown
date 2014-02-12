@@ -24,3 +24,18 @@ let {
 		amount    <- [list 2 5 10]
 	} in itemb
 }
+itemb {
+	id: cream
+	name: "Amulet of Healing Potion Creation"
+	type: amulet
+	variation: 0
+	description: "Creates a Medium Health Potion"
+	code: {
+		item {
+			id: hpotmed
+			x: 6
+			y: 6
+			mapname: testmap
+		}
+	}
+}
