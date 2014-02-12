@@ -102,6 +102,10 @@ function renderer(model) {
       case "potion":
         drawFromTileset({x: 0, y: 6}, itempos)
         return
+
+      default:
+        drawFromTileset({x: 5, y:6}, itempos)
+        return
       }
     })
   }
