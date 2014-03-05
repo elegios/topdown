@@ -48,7 +48,7 @@ func create(ch chan map[string]interface{}, name string) {
 		return ok
 	})
 	c.Name = name
-	c.Inventory = []string{"hpotmed", "hpotmin", "cream"}
+	c.Inventory = []string{"hpotmed", "hpotmin", "cream", "stabbysword"}
 	world.Charids[c.Id] = &c
 	world.MapCharacters[c.GetPosition()] = &c
 	ch <- map[string]interface{}{"id": c.Id}
@@ -86,12 +86,35 @@ func useItem(charId, action, blueprintId string) {
 	c.Actions--
 	switch action {
 	case "use":
-		world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
+		blueprint, ok := world.ItemBlueprints[blueprintId]
+		if !ok {
+			return
+		}
+
+		if blueprint.Equippable != types.EQUIP_NONE {
+			c.RemoveItem(blueprintId)
+			switch blueprint.Equippable {
+			case types.EQUIP_WEAP:
+				if c.Weapon != "" {
+					c.AddItem(c.Weapon)
+				}
+				c.Weapon = blueprintId
+
+			case types.EQUIP_ARMO:
+				if c.Armor != "" {
+					c.AddItem(c.Armor)
+				}
+				c.Armor = blueprintId
+			}
+
+		} else {
+			world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
+		}
 
 	case "drop":
 		pos := c.GetPosition()
 		if _, alreadyPresent := world.MapItems[pos]; alreadyPresent {
-			break
+			return
 		}
 		c.RemoveItem(blueprintId)
 		world.MapItems[pos] = types.Item{c.X, c.Y, blueprintId}

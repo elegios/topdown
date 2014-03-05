@@ -4,6 +4,12 @@ type CharacterRunnable interface {
 	RunOn(origin, target *Character)
 }
 
+const (
+	EQUIP_NONE = iota
+	EQUIP_WEAP
+	EQUIP_ARMO
+)
+
 type Item struct {
 	X  int    `json:"x"`
 	Y  int    `json:"y"`
@@ -11,11 +17,13 @@ type Item struct {
 }
 
 type ItemBlueprint struct {
-	Name        string            `json:"name"`
-	Type        string            `json:"type"`
-	Variation   int               `json:"variation"`
-	Description string            `json:"description"`
-	Effect      CharacterRunnable `json:"-"`
+	Name        string `json:"name"`
+	Type        string `json:"type"`
+	Variation   int    `json:"variation"`
+	Description string `json:"description"`
+
+	Equippable int               `json:"-"`
+	Effect     CharacterRunnable `json:"-"`
 }
 
 func (w *World) loadItems(path, mapname string) (err error) {

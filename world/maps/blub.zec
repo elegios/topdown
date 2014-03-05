@@ -9,6 +9,17 @@ itemb {
 		remove pot
 	}
 }
+itemb {
+	id: stabbysword
+	name: "Sword of stabbyness"
+	type: "sword"
+	variation: 0
+	description: "You could stab someone with this. Watch it!"
+	equippable: weapon
+	code: {
+		nudge target health -2
+	}
+}
 let {
 	type = potion
 	description = "Heals you some"

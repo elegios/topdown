@@ -102,7 +102,7 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 		gelo.ArgumentError(vm, "itemb", "[properties]", args)
 	}
 
-	var setId, setName, setType, setVariation, setDescription, setCode bool
+	var setId, setName, setType, setVariation, setDescription, setEquippable, setCode bool
 	var id string
 	blueprint := types.ItemBlueprint{
 		Effect: &itemRunner{
@@ -159,6 +159,25 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 				blueprint.Description = vm.API.SymbolOrElse(lineList.Next.Value).String()
 				setDescription = true
 
+			case "equippable:":
+				if setEquippable {
+					gelo.RuntimeError(vm, "Attempted to set item equippable twice.")
+				}
+				switch vm.API.SymbolOrElse(lineList.Next.Value).String() {
+				case "none":
+					blueprint.Equippable = types.EQUIP_NONE
+
+				case "weapon":
+					blueprint.Equippable = types.EQUIP_WEAP
+
+				case "armor":
+					blueprint.Equippable = types.EQUIP_ARMO
+
+				default:
+					gelo.RuntimeError(vm, "Equippable must be either \"weapon\", \"armor\" or \"none\"")
+				}
+				setEquippable = true
+
 			case "code:":
 				if setCode {
 					gelo.RuntimeError(vm, "Attempted to set item code twice.")
@@ -187,6 +206,25 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 	}
 	if !setDescription {
 		blueprint.Description = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("description"))).String()
+	}
+	if !setEquippable {
+		if symb, ok := vm.Ns.Lookup(gelo.Convert("equippable")); ok {
+			switch vm.API.SymbolOrElse(symb).String() {
+			case "none":
+				blueprint.Equippable = types.EQUIP_NONE
+
+			case "weapon":
+				blueprint.Equippable = types.EQUIP_WEAP
+
+			case "armor":
+				blueprint.Equippable = types.EQUIP_ARMO
+
+			default:
+				gelo.RuntimeError(vm, "Equippable must be either \"weapon\" or \"armor\"")
+			}
+		} else {
+			blueprint.Equippable = types.EQUIP_NONE
+		}
 	}
 	if !setCode {
 		blueprint.Effect.(*itemRunner).code = vm.API.QuoteOrElse(vm.Ns.LookupOrElse(gelo.Convert("code")))

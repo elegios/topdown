@@ -21,6 +21,11 @@ func (c *Character) GetPosition() Position {
 	return Position{c.Mapname, c.X, c.Y}
 }
 
+func (c *Character) AddItem(bid string) bool {
+	c.Inventory = append(c.Inventory, bid)
+	return true //This will eventually be some check concerning inventory size
+}
+
 func (c *Character) RemoveItem(bid string) bool {
 	for i, item := range c.Inventory {
 		if item == bid {
