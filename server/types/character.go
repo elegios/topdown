@@ -21,6 +21,18 @@ func (c *Character) GetPosition() Position {
 	return Position{c.Mapname, c.X, c.Y}
 }
 
+func (c *Character) RemoveItem(bid string) bool {
+	for i, item := range c.Inventory {
+		if item == bid {
+			c.Inventory[i] = c.Inventory[len(c.Inventory)-1]
+			c.Inventory = c.Inventory[:len(c.Inventory)-1]
+			return true
+		}
+	}
+
+	return false
+}
+
 func (w *World) loadCharacters(path string) (err error) {
 	err = dec(path, &w.Charids)
 	if err != nil {

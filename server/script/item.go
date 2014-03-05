@@ -287,12 +287,8 @@ func (o *onAttackVals) RemoveItem(vm *gelo.VM, args *gelo.List, argc uint) gelo.
 	}
 
 	bid := vm.API.SymbolOrElse(args.Value).String()
-	for i, item := range c.Inventory {
-		if item == bid {
-			c.Inventory[i] = c.Inventory[len(c.Inventory)-1]
-			c.Inventory = c.Inventory[:len(c.Inventory)-1]
-			return gelo.True
-		}
+	if c.RemoveItem(bid) {
+		return gelo.True
 	}
 	return gelo.False
 }
