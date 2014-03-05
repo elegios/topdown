@@ -100,19 +100,23 @@ or
 }
 or
 {
-  damage: <damage>,
-  dealer: <id>, #may not be present
+  nudge: <nudge-type>,
+  amount: <amount>,
+  originChar: <id>,
   target: <id>,
 }
 or
 {
-  damage: <damage>,
-  origin: {
+  nudge: <nudge-type>,
+  amount: <amount>,
+  originPoint: {
     x: <x>,
     y: <y>,
   },
   target: <id>,
 }
+#<nudge-type> :: string, "health" | "maxhealth" | "viewdist", what type of data the nudge has modified
+#<amount> :: int, an int describing the change
 
 <character>:
 {
