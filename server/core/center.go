@@ -83,9 +83,19 @@ func useItem(charId, action, blueprintId string) {
 	if index == -1 {
 		return
 	}
-	slog.Println("used an item")
 	c.Actions--
-	world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
+	switch action {
+	case "use":
+		world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
+
+	case "drop":
+		pos := c.GetPosition()
+		if _, alreadyPresent := world.MapItems[pos]; alreadyPresent {
+			break
+		}
+		c.RemoveItem(blueprintId)
+		world.MapItems[pos] = types.Item{c.X, c.Y, blueprintId}
+	}
 	return
 }
 
