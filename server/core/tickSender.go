@@ -21,7 +21,7 @@ func sendTicks(conn *websocket.Conn, data *clientData) {
 	defer func() { otm.Rem <- conn }()
 	for {
 		<-ch
-		slog.Println("Preparing to send tick to", conn.LocalAddr())
+		slog.Println("Preparing to send tick to", conn.Request().RemoteAddr)
 		update := tickUpdate{
 			Maps:         make(map[string][]types.MapPos),
 			Controllable: make([]string, 0),

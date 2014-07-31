@@ -70,7 +70,7 @@ function mapmodel() {
     for (var mapname in data.items) {
       if (!data.items.hasOwnProperty(mapname))
         return
-      
+
       data.items[mapname].forEach(function(item) {
         ensure(item.id, send)
       })

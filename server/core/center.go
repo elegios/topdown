@@ -9,6 +9,7 @@ func center(ch <-chan request) {
 	for req := range ch {
 		c := req.message
 		slog.Println("Got a command:", c)
+
 		switch c["command"] {
 		case "blueprintrequest":
 			blueprintRequest(req.ch, c["id"])

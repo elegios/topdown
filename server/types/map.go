@@ -8,41 +8,47 @@ import (
 	"path/filepath"
 )
 
+const (
+	VISION_BLOCK = 0x200
+	WALK_BLOCK   = 0x100
+	VARIANT      = 0x10
+)
+
 var (
 	translation = map[color.Color]Bits{
 		//blue walls
-		color.RGBA{46, 62, 95, 255}:   0x300,
-		color.RGBA{67, 92, 142, 255}:  0x310,
-		color.RGBA{76, 106, 163, 255}: 0x320,
-		color.RGBA{88, 122, 188, 255}: 0x330,
+		color.RGBA{46, 62, 95, 255}:   VISION_BLOCK | WALK_BLOCK | 0*VARIANT,
+		color.RGBA{67, 92, 142, 255}:  VISION_BLOCK | WALK_BLOCK | 1*VARIANT,
+		color.RGBA{76, 106, 163, 255}: VISION_BLOCK | WALK_BLOCK | 2*VARIANT,
+		color.RGBA{88, 122, 188, 255}: VISION_BLOCK | WALK_BLOCK | 3*VARIANT,
 		//blue nonwalls
-		color.RGBA{29, 38, 61, 255}: 0x000,
-		color.RGBA{39, 50, 83, 255}: 0x010,
+		color.RGBA{29, 38, 61, 255}: 0 * VARIANT,
+		color.RGBA{39, 50, 83, 255}: 1 * VARIANT,
 
 		//cave walls
-		color.RGBA{84, 83, 35, 255}: 0x301,
+		color.RGBA{84, 83, 35, 255}: VISION_BLOCK | WALK_BLOCK | 0*VARIANT | 1,
 		//cave nonwalls
-		color.RGBA{39, 46, 26, 255}: 0x001,
-		color.RGBA{52, 61, 35, 255}: 0x011,
+		color.RGBA{39, 46, 26, 255}: 0*VARIANT | 1,
+		color.RGBA{52, 61, 35, 255}: 1*VARIANT | 1,
 
 		//grass walls
-		color.RGBA{82, 154, 70, 255}: 0x302,
+		color.RGBA{82, 154, 70, 255}: VISION_BLOCK | WALK_BLOCK | 0*VARIANT | 2,
 		//grass nonwalls
-		color.RGBA{19, 41, 20, 255}: 0x002,
-		color.RGBA{27, 57, 29, 255}: 0x012,
-		color.RGBA{35, 76, 38, 255}: 0x022,
-		color.RGBA{43, 92, 46, 255}: 0x032,
-		color.RGBA{23, 36, 46, 255}: 0x042,
-		color.RGBA{31, 47, 26, 255}: 0x052,
+		color.RGBA{19, 41, 20, 255}: 0*VARIANT | 2,
+		color.RGBA{27, 57, 29, 255}: 1*VARIANT | 2,
+		color.RGBA{35, 76, 38, 255}: 2*VARIANT | 2,
+		color.RGBA{43, 92, 46, 255}: 3*VARIANT | 2,
+		color.RGBA{23, 36, 46, 255}: 4*VARIANT | 2,
+		color.RGBA{31, 47, 26, 255}: 5*VARIANT | 2,
 
 		//water walls
-		color.RGBA{21, 92, 127, 255}:  0x103,
-		color.RGBA{30, 119, 149, 255}: 0x313,
-		color.RGBA{34, 135, 178, 255}: 0x123,
+		color.RGBA{21, 92, 127, 255}:  WALK_BLOCK | 0*VARIANT | 3,
+		color.RGBA{30, 119, 149, 255}: WALK_BLOCK | 1*VARIANT | 3 | VISION_BLOCK,
+		color.RGBA{34, 135, 178, 255}: WALK_BLOCK | 2*VARIANT | 3,
 
 		//bridge nonwalls
-		color.RGBA{86, 62, 35, 255}:    0x004,
-		color.RGBA{143, 140, 117, 255}: 0x014,
+		color.RGBA{86, 62, 35, 255}:    0*VARIANT | 4,
+		color.RGBA{143, 140, 117, 255}: 1*VARIANT | 4,
 	}
 )
 
