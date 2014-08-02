@@ -31,6 +31,7 @@ type World struct {
 	MapCharacters  map[Position]*Character
 	MapItems       map[Position]Item
 	MapProps       map[Position]Prop
+	Updates        []Update
 	Maps           map[string][][]Bits
 	mapRoot        string
 	liveMapRoot    string

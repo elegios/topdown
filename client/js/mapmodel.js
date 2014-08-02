@@ -56,6 +56,9 @@ function mapmodel() {
     data.props = update.props
     data.items = update.items
     data.updates = update.updates
+    data.updates.forEach(function(update) {
+      console.log(update)
+    })
 
     data.characters.forEach(function(character) {
       ensure(character.weapon, send)

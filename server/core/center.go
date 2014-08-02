@@ -179,5 +179,6 @@ func tick() {
 	otm.In <- struct{}{}
 	otm.Add(1)
 	otm.Wait()
+	world.Updates = nil
 	slog.Print("Tick is done")
 }

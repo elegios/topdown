@@ -12,6 +12,7 @@ type tickUpdate struct {
 	Characters   []*types.Character        `json:"characters"`
 	Props        map[string][]types.Prop   `json:"props"`
 	Items        map[string][]types.Item   `json:"items"`
+	Updates      []interface{}             `json:"updates"`
 	positions    map[types.Position]bool
 }
 
@@ -28,6 +29,7 @@ func sendTicks(conn *websocket.Conn, data *clientData) {
 			Characters:   make([]*types.Character, 0),
 			Props:        make(map[string][]types.Prop),
 			Items:        make(map[string][]types.Item),
+			Updates:      make([]interface{}, 0),
 			positions:    make(map[types.Position]bool),
 		}
 		updateControllable(data, &update)
@@ -95,6 +97,11 @@ func collectVisible(update *tickUpdate) {
 		}
 		if i, ok := world.MapItems[pos]; ok {
 			update.Items[pos.Mapid] = append(update.Items[pos.Mapid], i)
+		}
+	}
+	for _, u := range world.Updates {
+		if update.positions[u.Pos] {
+			update.Updates = append(update.Updates, u.Content)
 		}
 	}
 }

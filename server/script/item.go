@@ -234,17 +234,39 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 	return gelo.Null
 }
 
-func Nudge(char *types.Character, val string, amount int) {
+func nudge(char *types.Character, val string, amount int) int {
 	switch val {
 	case "health":
+		health := char.Health
 		char.Health += amount
+		if char.Health > char.MaxHealth {
+			char.Health = char.MaxHealth
+		}
+		amount = char.Health - health
 
 	case "maxhealth":
 		char.MaxHealth += amount
+		if char.Health > char.MaxHealth {
+			char.Health = char.MaxHealth
+		}
 
 	case "viewdist":
 		char.ViewDist += amount
 	}
+
+	return amount
+}
+
+func nudgeMessage(world *types.World, origin, target *types.Character, nudgeType string, amount int) {
+	world.Updates = append(world.Updates, types.Update{
+		Pos: target.Pos,
+		Content: types.NudgeCharUpdate{
+			Nudge:      nudgeType,
+			Amount:     amount,
+			OriginChar: origin.Id,
+			Target:     target.Id,
+		},
+	})
 }
 
 // target may be nil, origin shouldn't be
@@ -297,7 +319,8 @@ func (o *onAttackVals) Nudge(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word 
 	}
 	val := vm.API.SymbolOrElse(args.Value).String()
 	amount, _ := vm.API.NumberOrElse(args.Next.Value).Int()
-	Nudge(c, val, int(amount))
+	actualAmount := nudge(c, val, int(amount))
+	nudgeMessage(o.world, o.origin, c, val, actualAmount)
 
 	return gelo.Null
 }
