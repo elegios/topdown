@@ -51,7 +51,7 @@ func create(ch chan map[string]interface{}, name string) {
 	c.Name = name
 	c.Inventory = []string{"hpotmed", "hpotmin", "cream", "stabbysword"}
 	world.Charids[c.Id] = &c
-	world.MapCharacters[c.GetPosition()] = &c
+	world.MapCharacters[c.Pos] = &c
 	ch <- map[string]interface{}{"id": c.Id}
 }
 
@@ -60,11 +60,11 @@ func pickup(charId string) {
 	if !ok || c.Actions < 1 {
 		return
 	}
-	item, ok := world.MapItems[c.GetPosition()]
+	item, ok := world.MapItems[c.Pos]
 	if !ok {
 		return
 	}
-	delete(world.MapItems, c.GetPosition())
+	delete(world.MapItems, c.Pos)
 	c.Inventory = append(c.Inventory, item.Id)
 	c.Actions--
 }
@@ -113,12 +113,12 @@ func useItem(charId, action, blueprintId string) {
 		}
 
 	case "drop":
-		pos := c.GetPosition()
+		pos := c.Pos
 		if _, alreadyPresent := world.MapItems[pos]; alreadyPresent {
 			return
 		}
 		c.RemoveItem(blueprintId)
-		world.MapItems[pos] = types.Item{c.X, c.Y, blueprintId}
+		world.MapItems[pos] = types.Item{c.Pos.X, c.Pos.Y, blueprintId}
 	}
 	return
 }
@@ -128,8 +128,8 @@ func move(charId, direction string) {
 	if !ok || c.Actions < 1 {
 		return
 	}
-	xMod := c.X
-	yMod := c.Y
+	xMod := c.Pos.X
+	yMod := c.Pos.Y
 	switch direction {
 	case "left":
 		xMod += -1
@@ -143,13 +143,13 @@ func move(charId, direction string) {
 		//TODO: changing maps
 		return
 	}
-	if yMod < 0 || xMod < 0 || yMod >= len(world.Maps[c.Mapname]) || xMod >= len(world.Maps[c.Mapname][yMod]) {
+	if yMod < 0 || xMod < 0 || yMod >= len(world.Maps[c.Pos.Mapid]) || xMod >= len(world.Maps[c.Pos.Mapid][yMod]) {
 		return
 	}
-	if world.Maps[c.Mapname][yMod][xMod].Collides() {
+	if world.Maps[c.Pos.Mapid][yMod][xMod].Collides() {
 		return
 	}
-	pos := types.Position{c.Mapname, xMod, yMod}
+	pos := types.Position{c.Pos.Mapid, xMod, yMod}
 	if _, ok := world.MapCharacters[pos]; ok {
 		//TODO: attack
 		return
@@ -159,17 +159,17 @@ func move(charId, direction string) {
 		return
 	}
 	c.Actions--
-	delete(world.MapCharacters, c.GetPosition())
-	c.X = xMod
-	c.Y = yMod
-	world.MapCharacters[c.GetPosition()] = c
+	delete(world.MapCharacters, c.Pos)
+	c.Pos.X = xMod
+	c.Pos.Y = yMod
+	world.MapCharacters[c.Pos] = c
 }
 
 func tick() {
 	for _, c := range world.Charids {
 		if c.Health <= 0 {
 			delete(world.Charids, c.Id)
-			delete(world.MapCharacters, c.GetPosition())
+			delete(world.MapCharacters, c.Pos)
 			continue
 		}
 

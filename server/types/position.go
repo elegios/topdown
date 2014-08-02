@@ -1,9 +1,9 @@
 package types
 
 type Position struct {
-	Mapid string
-	X     int
-	Y     int
+	Mapid string `json:"mapname"`
+	X     int    `json:"x"`
+	Y     int    `json:"y"`
 }
 
 type MapPos struct {

@@ -89,14 +89,11 @@
 {
   speech: <speech>,
   character: <id>,
-  duration: <duration>,
 }
 or
 {
   speech: <speech>,
-  x: <x>,
-  y: <y>,
-  duration: <duration>,
+  position: <position>,
 }
 or
 {
@@ -109,20 +106,22 @@ or
 {
   nudge: <nudge-type>,
   amount: <amount>,
-  originPoint: {
-    x: <x>,
-    y: <y>,
-  },
+  originPoint: <position>,
   target: <id>,
 }
 #<nudge-type> :: string, "health" | "maxhealth" | "viewdist", what type of data the nudge has modified
 #<amount> :: int, an int describing the change
 
-<character>:
+<position>:
 {
   mapname: <mapname>,
   x: <x>,
   y: <y>,
+}
+
+<character>:
+{
+  position: <position>,
   id: <id>,
   variation: <variation>,
   name: <name>,
@@ -136,9 +135,8 @@ or
 
 <prop>:
 {
-  mapname: <mapname>
-  x: x,
-  y: y,
+  x: <x>,
+  y: <y>,
   variation: <variation>,
   collide: <collide>,
 }

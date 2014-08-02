@@ -1,9 +1,7 @@
 package types
 
 type Character struct {
-	Mapname   string   `json:"mapname"`
-	X         int      `json:"x"`
-	Y         int      `json:"y"`
+	Pos       Position `json:"position"`
 	Id        string   `json:"id"`
 	Variation int      `json:"variation"`
 	Name      string   `json:"name"`
@@ -15,10 +13,6 @@ type Character struct {
 	Inventory []string `json:"inventory"`
 
 	ViewDist int `json:"-"`
-}
-
-func (c *Character) GetPosition() Position {
-	return Position{c.Mapname, c.X, c.Y}
 }
 
 func (c *Character) AddItem(bid string) bool {
@@ -45,7 +39,7 @@ func (w *World) loadCharacters(path string) (err error) {
 	}
 
 	for _, c := range w.Charids {
-		w.MapCharacters[c.GetPosition()] = c
+		w.MapCharacters[c.Pos] = c
 	}
 
 	return

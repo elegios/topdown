@@ -59,23 +59,24 @@ func updateControllable(data *clientData, update *tickUpdate) {
 func collectMapPos(update *tickUpdate) {
 	for _, cid := range update.Controllable {
 		c := world.Charids[cid]
-		j := helpers.Max(c.Y-c.ViewDist, 0)
-		maxJ := helpers.Min(c.Y+c.ViewDist, len(world.Maps[c.Mapname])-1)
-		maxI := helpers.Min(c.X+c.ViewDist, len(world.Maps[c.Mapname][0])-1)
+		p := c.Pos
+		j := helpers.Max(p.Y-c.ViewDist, 0)
+		maxJ := helpers.Min(p.Y+c.ViewDist, len(world.Maps[p.Mapid])-1)
+		maxI := helpers.Min(p.X+c.ViewDist, len(world.Maps[p.Mapid][0])-1)
 		pos := types.Position{
-			Mapid: c.Mapname,
+			Mapid: p.Mapid,
 		}
 		for ; j <= maxJ; j++ {
 			pos.Y = j
-			i := helpers.Max(c.X-c.ViewDist, 0)
+			i := helpers.Max(p.X-c.ViewDist, 0)
 			for ; i <= maxI; i++ {
 				pos.X = i
 				if update.positions[pos] ||
-					(j-c.Y)*(j-c.Y)+(i-c.X)*(i-c.X) > c.ViewDist*c.ViewDist+1 ||
-					!helpers.Visible(world.Maps[c.Mapname], c.X, c.Y, i, j) {
+					(j-p.Y)*(j-p.Y)+(i-p.X)*(i-p.X) > c.ViewDist*c.ViewDist+1 ||
+					!helpers.Visible(world.Maps[p.Mapid], p.X, p.Y, i, j) {
 					continue
 				}
-				update.positions[types.Position{c.Mapname, i, j}] = true
+				update.positions[types.Position{p.Mapid, i, j}] = true
 			}
 		}
 	}

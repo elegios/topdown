@@ -22,9 +22,9 @@ function renderer(model) {
 
   function drawmap() {
     context.clearRect(0, 0, canvas.width, canvas.height)
-    data.center.x = model.currChar().x
-    data.center.y = model.currChar().y
-    data.mapname = model.currChar().mapname
+    data.center.x = model.currChar().position.x
+    data.center.y = model.currChar().position.y
+    data.mapname = model.currChar().position.mapname
     xoff = Math.round(data.center.x*TILEX - canvas.width/2)
     yoff = Math.round(data.center.y*TILEY - canvas.height/2)
 
@@ -65,11 +65,11 @@ function renderer(model) {
 
   function drawCharacters() {
     model.characters.forEach(function(character) {
-      if (character.mapname !== data.mapname)
+      if (character.position.mapname !== data.mapname)
         return
 
       var tile = {x: character.variation % 5, y: 8}
-      drawFromTileset(tile, character)
+      drawFromTileset(tile, character.position)
     })
   }
 

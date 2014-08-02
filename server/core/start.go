@@ -39,9 +39,11 @@ func Load(root string) {
 
 func Start(fspath, wspath, clientdir string) {
 	defaultCharacter = types.Character{
-		Mapname:   "testmap",
-		X:         5,
-		Y:         5,
+		Pos: types.Position{
+			Mapid: "testmap",
+			X:     5,
+			Y:     5,
+		},
 		Id:        "",
 		Variation: 0,
 		Name:      "",
