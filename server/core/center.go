@@ -140,7 +140,12 @@ func move(charId, direction string) {
 	case "down":
 		yMod += 1
 	case "through":
-		//TODO: changing maps
+		if pos, ok := world.MapTransitions[c.Pos]; ok {
+			delete(world.MapCharacters, c.Pos)
+			c.Pos = pos
+			world.MapCharacters[c.Pos] = c
+		}
+		wlog.Print(c.Pos)
 		return
 	}
 	if yMod < 0 || xMod < 0 || yMod >= len(world.Maps[c.Pos.Mapid]) || xMod >= len(world.Maps[c.Pos.Mapid][yMod]) {

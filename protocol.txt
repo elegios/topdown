@@ -4,7 +4,6 @@
 - The game plays in "ticks", where the amount of actions per tick is limited per character.
 - The server may decide whether actions are carried out immediately or after a call to "tick".
 - The server only responds with <tick-update>, one response per server tick, and <item>, one per "itemrequest".
-- Upon connecting the server will send one tick-update.
 - Moving into a character or other colliding object might be an attack, it might activate something
 (e.g. press a button), it might initiate conversation, or it might simply fail. It will consume an action regardless.
 
@@ -158,6 +157,6 @@ or
 #<bid> :: string, an identifier of an item blueprint id. Multiple things may use the same bid.
 #<name> :: string, a name to show to players, no unique guarantee
 #<health> :: int, a number representing hitpoints
-#<itemtype> :: string, "weapon" | "armor" | "use" | "nouse"
+#<itemtype> :: string, a descriptive type, e.g. "sword", "potion", "spatula" and so on
 #<variation> :: int, selects a display variation to render
 #<itemdescription> :: string, a description to show the players

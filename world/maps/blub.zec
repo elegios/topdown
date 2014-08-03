@@ -1,7 +1,7 @@
 itemb {
 	id: pot
 	name: "Potion of Awesome"
-	type: "potion"
+	type: potion
 	variation: 0
 	description: "It is awesome"
 	code: {
@@ -12,7 +12,7 @@ itemb {
 itemb {
 	id: stabbysword
 	name: "Sword of stabbyness"
-	type: "sword"
+	type: sword
 	variation: 0
 	description: "You could stab someone with this. Watch it!"
 	equippable: weapon

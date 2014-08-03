@@ -21,7 +21,7 @@ const (
 )
 
 type VM interface {
-	RunConstantScript(path string, world *World) error
+	RunConstantScript(path, name string, world *World) error
 	RunLiveScript(path string, world *World) error
 }
 
@@ -31,6 +31,7 @@ type World struct {
 	MapCharacters  map[Position]*Character
 	MapItems       map[Position]Item
 	MapProps       map[Position]Prop
+	MapTransitions map[Position]Position
 	Updates        []Update
 	Maps           map[string][][]Bits
 	mapRoot        string
@@ -70,6 +71,7 @@ func LoadWorld(vm VM, root string) *World {
 func (w *World) LoadConstantWorld() error {
 	w.ItemBlueprints = make(map[string]ItemBlueprint)
 	w.Maps = make(map[string][][]Bits)
+	w.MapTransitions = make(map[Position]Position)
 
 	return filepath.Walk(w.mapRoot, w.loadMapData)
 }
@@ -94,7 +96,7 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 }
 
 func (w *World) loadMapScript(path, name string) error {
-	return w.vm.RunConstantScript(path, w)
+	return w.vm.RunConstantScript(path, name, w)
 }
 
 func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {

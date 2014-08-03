@@ -85,7 +85,7 @@ func (w *vmworld) Item(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
 	return gelo.Null
 }
 
-func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
+func (w *constArgs) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
 	if argc > 1 {
 		gelo.ArgumentError(vm, "itemb", "[properties]", args)
 	}
@@ -94,7 +94,7 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 	var id string
 	blueprint := types.ItemBlueprint{
 		Effect: &itemRunner{
-			world: (*types.World)(w),
+			world: w.world,
 			vm:    vm,
 			ns:    vm.Ns.Locals(vm.Ns.Depth() - 3), // ignore the namespaces with the language and the "extraapi"
 		},
@@ -212,7 +212,7 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 		blueprint.Effect.(*itemRunner).code = vm.API.QuoteOrElse(vm.Ns.LookupOrElse(gelo.Convert("code")))
 	}
 
-	w.ItemBlueprints[id] = blueprint
+	w.world.ItemBlueprints[id] = blueprint
 	return gelo.Null
 }
 
