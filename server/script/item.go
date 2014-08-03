@@ -47,24 +47,18 @@ func (w *vmworld) Item(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
 				if setX {
 					gelo.RuntimeError(vm, "Attempted to set x twice")
 				}
-				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
-				if !ok {
-					gelo.TypeMismatch(vm, "int", lineList.Next.Value)
-				}
-				item.X = int(num)
-				pos.X = int(num)
+				num := ensureInt(vm, lineList.Next.Value)
+				item.X = num
+				pos.X = num
 				setX = true
 
 			case "y:":
 				if setY {
 					gelo.RuntimeError(vm, "Attempted to set y twice")
 				}
-				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
-				if !ok {
-					gelo.TypeMismatch(vm, "int", lineList.Next.Value)
-				}
-				item.Y = int(num)
-				pos.Y = int(num)
+				num := ensureInt(vm, lineList.Next.Value)
+				item.Y = num
+				pos.Y = num
 				setY = true
 			}
 		}
@@ -77,20 +71,14 @@ func (w *vmworld) Item(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
 		pos.Mapid = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("mapname"))).String()
 	}
 	if !setX {
-		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("x"))).Int()
-		if !ok {
-			gelo.RuntimeError(vm, "X has to be an integer")
-		}
-		pos.X = int(num)
-		item.X = int(num)
+		num := ensureInt(vm, vm.Ns.LookupOrElse(gelo.Convert("x")))
+		pos.X = num
+		item.X = num
 	}
 	if !setY {
-		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("y"))).Int()
-		if !ok {
-			gelo.RuntimeError(vm, "Y has to be an integer")
-		}
-		pos.Y = int(num)
-		item.Y = int(num)
+		num := ensureInt(vm, vm.Ns.LookupOrElse(gelo.Convert("y")))
+		pos.Y = num
+		item.Y = num
 	}
 
 	w.MapItems[pos] = item
@@ -145,11 +133,8 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 				if setVariation {
 					gelo.RuntimeError(vm, "Attempted to set item variation twice.")
 				}
-				num, ok := vm.API.NumberOrElse(lineList.Next.Value).Int()
-				if !ok {
-					gelo.RuntimeError(vm, "Variation should have been an int.")
-				}
-				blueprint.Variation = int(num)
+				num := ensureInt(vm, lineList.Next.Value)
+				blueprint.Variation = num
 				setVariation = true
 
 			case "description:":
@@ -198,11 +183,8 @@ func (w *vmworld) ItemBlueprint(vm *gelo.VM, args *gelo.List, argc uint) gelo.Wo
 		blueprint.Type = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("type"))).String()
 	}
 	if !setVariation {
-		num, ok := vm.API.NumberOrElse(vm.Ns.LookupOrElse(gelo.Convert("variation"))).Int()
-		blueprint.Variation = int(num)
-		if !ok {
-			gelo.RuntimeError(vm, "Variation should have been an int")
-		}
+		num := ensureInt(vm, vm.Ns.LookupOrElse(gelo.Convert("variation")))
+		blueprint.Variation = num
 	}
 	if !setDescription {
 		blueprint.Description = vm.API.SymbolOrElse(vm.Ns.LookupOrElse(gelo.Convert("description"))).String()
@@ -318,8 +300,8 @@ func (o *onAttackVals) Nudge(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word 
 		args = args.Next
 	}
 	val := vm.API.SymbolOrElse(args.Value).String()
-	amount, _ := vm.API.NumberOrElse(args.Next.Value).Int()
-	actualAmount := nudge(c, val, int(amount))
+	amount := ensureInt(vm, args.Next.Value)
+	actualAmount := nudge(c, val, amount)
 	nudgeMessage(o.world, o.origin, c, val, actualAmount)
 
 	return gelo.Null
