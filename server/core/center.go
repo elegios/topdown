@@ -28,6 +28,9 @@ func center(ch <-chan request) {
 
 		case "tick":
 			tick()
+
+		case "speak":
+			speak(c["character"], c["speech"])
 		}
 	}
 }
@@ -186,4 +189,20 @@ func tick() {
 	otm.Wait()
 	world.Updates = nil
 	slog.Print("Tick is done")
+}
+
+func speak(cid, speech string) {
+	c, ok := world.Charids[cid]
+	if !ok {
+		return
+	}
+
+	update := types.Update{
+		Pos: c.Pos,
+		Content: types.SpeechCharUpdate{
+			Speech:    speech,
+			Character: cid,
+		},
+	}
+	world.Updates = append(world.Updates, update)
 }

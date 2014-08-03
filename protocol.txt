@@ -52,6 +52,12 @@
 #<vertical> :: string, "up" | "down"
 #<horizontal> :: string, "left" | "right"
 
+{
+  command: "speak",
+  character: <id>,
+  speech: <speech>,
+}
+
 
 
 # Responses #
@@ -160,3 +166,4 @@ or
 #<itemtype> :: string, a descriptive type, e.g. "sword", "potion", "spatula" and so on
 #<variation> :: int, selects a display variation to render
 #<itemdescription> :: string, a description to show the players
+#<speech> :: string
