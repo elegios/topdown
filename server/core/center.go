@@ -158,6 +158,7 @@ func move(charId, direction string) {
 		return
 	}
 	pos := types.Position{c.Pos.Mapid, xMod, yMod}
+	c.Actions--
 	if _, ok := world.MapCharacters[pos]; ok {
 		//TODO: attack
 		return
@@ -166,7 +167,6 @@ func move(charId, direction string) {
 		//TODO: check if something special should happen
 		return
 	}
-	c.Actions--
 	delete(world.MapCharacters, c.Pos)
 	c.Pos.X = xMod
 	c.Pos.Y = yMod
@@ -181,7 +181,7 @@ func tick() {
 			continue
 		}
 
-		c.Actions = defaultActionCount
+		c.UpdateActions()
 	}
 
 	otm.In <- struct{}{}

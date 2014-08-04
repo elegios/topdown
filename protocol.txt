@@ -158,7 +158,7 @@ or
 
 #<mapname> :: string, a unique name of the map, may be shown to players
 #<x>, <y> :: int, tile coordinate
-#<actioncount> :: int, num of actions this particular tick
+#<actioncount> :: float, num of actions this particular tick, floor it for actual allowed actions
 #<id> :: string, no two things of the same type (i.e. <character> or <item>) may have the same
 #<bid> :: string, an identifier of an item blueprint id. Multiple things may use the same bid.
 #<name> :: string, a name to show to players, no unique guarantee
