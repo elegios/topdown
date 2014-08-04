@@ -62,6 +62,9 @@ func collectMapPos(update *tickUpdate) {
 	for _, cid := range update.Controllable {
 		c := world.Charids[cid]
 		p := c.Pos
+		visionFunc := func(x, y int) bool {
+			return world.Maps[p.Mapid][y][x].BlocksVision()
+		}
 		j := helpers.Max(p.Y-c.ViewDist, 0)
 		maxJ := helpers.Min(p.Y+c.ViewDist, len(world.Maps[p.Mapid])-1)
 		maxI := helpers.Min(p.X+c.ViewDist, len(world.Maps[p.Mapid][0])-1)
@@ -75,7 +78,7 @@ func collectMapPos(update *tickUpdate) {
 				pos.X = i
 				if update.positions[pos] ||
 					(j-p.Y)*(j-p.Y)+(i-p.X)*(i-p.X) > c.ViewDist*c.ViewDist+1 ||
-					!helpers.Visible(world.Maps[p.Mapid], p.X, p.Y, i, j) {
+					!helpers.Visible(visionFunc, p.X, p.Y, i, j) {
 					continue
 				}
 				update.positions[types.Position{p.Mapid, i, j}] = true

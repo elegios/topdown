@@ -1,10 +1,6 @@
 package helpers
 
-import (
-	"github.com/elegios/topdown/server/types"
-)
-
-func Visible(bs [][]types.Bits, x1, y1, x2, y2 int) bool {
+func Visible(blocksVision func(int, int) bool, x1, y1, x2, y2 int) bool {
 	cx := x1
 	cy := y1
 
@@ -32,7 +28,7 @@ func Visible(bs [][]types.Bits, x1, y1, x2, y2 int) bool {
 	err := dx - dy
 
 	for {
-		if bs[cy][cx].BlocksVision() {
+		if blocksVision(cx, cy) {
 			return false
 		}
 		if (cx == x2) && (cy == y2) {
