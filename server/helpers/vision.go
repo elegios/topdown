@@ -5,53 +5,47 @@ import (
 )
 
 func Visible(bs [][]types.Bits, x1, y1, x2, y2 int) bool {
-	if x1 == x2 && y1 == y2 {
-		return true
+	cx := x1
+	cy := y1
+
+	dx := x2 - cx
+	dy := y2 - cy
+	if dx < 0 {
+		dx = 0 - dx
 	}
-	if Abs(x1-x2) > Abs(y1-y2) {
-		dir := 1
-		if x1 > x2 {
-			dir = -1
-		}
-		k := k(x1, y1, x2, y2)
-		m := m(x1, y1, k)
-		for i := x1 + dir; i != x2; i += dir {
-			if bs[f(k, i, m, dir)][i].BlocksVision() {
-				return false
-			}
-		}
+	if dy < 0 {
+		dy = 0 - dy
+	}
+
+	var sx int
+	var sy int
+	if cx < x2 {
+		sx = 1
 	} else {
-		dir := 1
-		if y1 > y2 {
-			dir = -1
+		sx = -1
+	}
+	if cy < y2 {
+		sy = 1
+	} else {
+		sy = -1
+	}
+	err := dx - dy
+
+	for {
+		if bs[cy][cx].BlocksVision() {
+			return false
 		}
-		k := k(y1, x1, y2, x2)
-		m := m(y1, x1, k)
-		for j := y1 + dir; j != y2; j += dir {
-			if bs[j][f(k, j, m, dir)].BlocksVision() {
-				return false
-			}
+		if (cx == x2) && (cy == y2) {
+			return true
+		}
+		e2 := 2 * err
+		if e2 > (0 - dy) {
+			err -= dy
+			cx += sx
+		}
+		if e2 < dx {
+			err += dx
+			cy += sy
 		}
 	}
-
-	return true
-}
-
-func k(x1, y1, x2, y2 int) float32 {
-	if x1 == x2 {
-		return 0
-	}
-	return float32(y1-y2) / float32(x1-x2)
-}
-
-func m(x, y int, k float32) float32 {
-	return float32(y) - k*float32(x)
-}
-
-func f(k float32, x int, m float32, dir int) int {
-	y := k*(float32(x)) + m + 0.5
-	//if y-float32(int(y)) > 0.5 {
-	//	return int(y) + 1
-	//}
-	return int(y)
 }
