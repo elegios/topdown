@@ -267,6 +267,7 @@ func (i *itemRunner) RunOn(origin, target *types.Character) {
 	i.vm.RegisterBundle(map[string]interface{}{
 		"nudge":  vals.Nudge,
 		"remove": vals.RemoveItem,
+		"say":    vals.Speak,
 	})
 
 	i.vm.SetProgram(i.code)

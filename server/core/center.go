@@ -52,7 +52,7 @@ func create(ch chan map[string]interface{}, name string) {
 		return ok
 	})
 	c.Name = name
-	c.Inventory = []string{"hpotmed", "hpotmin", "cream", "stabbysword"}
+	c.Inventory = []string{"hpotmed", "hpotmin", "cream", "stabbysword", "speaker"}
 	world.Charids[c.Id] = &c
 	world.MapCharacters[c.Pos] = &c
 	ch <- map[string]interface{}{"id": c.Id}

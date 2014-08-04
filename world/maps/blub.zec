@@ -50,3 +50,14 @@ itemb {
 		}
 	}
 }
+itemb {
+	id: speaker
+	name: "Speaker"
+	type: speaker
+	variation: 0
+	description: "Say something rad"
+	code: {
+		say "something rad"
+		speak "something equally rad" at "testmap" 2 2
+	}
+}

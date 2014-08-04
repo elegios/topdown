@@ -39,7 +39,8 @@ func (v *VM) RunLiveScript(path string, world *types.World) error {
 }
 func liveBundle(world *types.World) map[string]interface{} {
 	return map[string]interface{}{
-		"item": (*vmworld)(world).Item,
+		"item":  (*vmworld)(world).Item,
+		"speak": (*vmworld)(world).SpeakAt,
 	}
 }
 
