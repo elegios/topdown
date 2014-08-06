@@ -4,6 +4,7 @@ import (
 	"github.com/aarzilli/golua/lua"
 	"github.com/elegios/topdown/server/types"
 	"log"
+	"os"
 )
 
 type vm struct {
@@ -45,11 +46,15 @@ func d(err error) {
 	}
 }
 
+var (
+	l = log.New(os.Stderr, "LUAE ", log.LstdFlags)
+)
+
 func (v *vm) trace(err error) error {
 	if err == nil {
 		return nil
 	}
-	log.Println(err)
-	log.Println(v.l.StackTrace())
+	l.Println(err)
+	l.Println(v.l.StackTrace())
 	return err
 }

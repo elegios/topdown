@@ -12,7 +12,7 @@ import (
 
 var (
 	slog = log.New(os.Stdout, "     ", log.LstdFlags)
-	wlog = log.New(os.Stdout, "WARN ", log.LstdFlags)
+	wlog = log.New(os.Stderr, "WARN ", log.LstdFlags)
 )
 
 var (
