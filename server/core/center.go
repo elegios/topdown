@@ -159,8 +159,10 @@ func move(charId, direction string) {
 	}
 	pos := types.Position{c.Pos.Mapid, xMod, yMod}
 	c.Actions--
-	if _, ok := world.MapCharacters[pos]; ok {
-		//TODO: attack
+	if other, ok := world.MapCharacters[pos]; ok {
+		if c.Weapon != "" {
+			world.ItemBlueprints[c.Weapon].Effect(c, other)
+		}
 		return
 	}
 	if p, ok := world.MapProps[pos]; ok && p.Collide {
