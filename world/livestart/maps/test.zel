@@ -1,6 +1,0 @@
-foreach {
-	id <- [list hpotmin hpotmed hpotmax]
-	x <- [list 4 5 6]
-	y <- [list 4]
-	mapname <- [list testmap]
-} in item

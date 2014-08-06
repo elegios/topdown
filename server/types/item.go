@@ -1,8 +1,6 @@
 package types
 
-type CharacterRunnable interface {
-	RunOn(origin, target *Character)
-}
+type CharacterRunnable func(origin, target *Character)
 
 const (
 	EQUIP_NONE = iota

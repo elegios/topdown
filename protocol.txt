@@ -104,14 +104,7 @@ or
 {
   nudge: <nudge-type>,
   amount: <amount>,
-  originChar: <id>,
-  target: <id>,
-}
-or
-{
-  nudge: <nudge-type>,
-  amount: <amount>,
-  originPoint: <position>,
+  originChar: <id>, #might not be present
   target: <id>,
 }
 #<nudge-type> :: string, "health" | "maxhealth" | "viewdist", what type of data the nudge has modified

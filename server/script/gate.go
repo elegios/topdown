@@ -1,34 +1,28 @@
 package script
 
 import (
-	"code.google.com/p/gelo"
-	"code.google.com/p/gelo/extensions"
+	"github.com/aarzilli/golua/lua"
 	"github.com/elegios/topdown/server/types"
 )
 
-var (
-	gateParser = extensions.MakeOrElseArgParser("'at ox oy 'to name 'at tx ty")
-)
-
-func (c *constArgs) Gate(vm *gelo.VM, args *gelo.List, argc uint) gelo.Word {
-	dict := gateParser(vm, args)
-	ox := ensureInt(vm, dict["ox"])
-	oy := ensureInt(vm, dict["oy"])
-	name := vm.API.SymbolOrElse(dict["name"]).String()
-	tx := ensureInt(vm, dict["tx"])
-	ty := ensureInt(vm, dict["ty"])
-
+func (v *vm) gate(L *lua.State) int {
+	L.GetField(lua.LUA_REGISTRYINDEX, "map")
 	origin := types.Position{
-		Mapid: c.name,
-		X:     ox,
-		Y:     oy,
+		Mapid: L.ToString(-1),
+		X:     L.CheckInteger(1),
+		Y:     L.CheckInteger(2),
 	}
-	target := types.Position{
-		Mapid: name,
-		X:     tx,
-		Y:     ty,
-	}
-	c.world.MapTransitions[origin] = target
 
-	return gelo.Null
+	L.CheckType(3, lua.LUA_TTABLE)
+	L.GetField(3, "map")
+	L.GetField(3, "x")
+	L.GetField(3, "y")
+
+	v.world.MapTransitions[origin] = types.Position{
+		Mapid: L.ToString(-3),
+		X:     L.ToInteger(-2),
+		Y:     L.ToInteger(-1),
+	}
+
+	return 0
 }

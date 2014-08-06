@@ -13,16 +13,16 @@ const (
 
 	CHARACTER_FILE = "characters"
 
-	CONST_SCRIPT_EXT = ".zec"
-	LIVE_SCRIPT_EXT  = ".zel"
+	CONST_SCRIPT_EXT = ".lua"
+	LIVE_SCRIPT_EXT  = ".lua"
 	MAP_EXT          = ".png"
 	ITEM_EXT         = ".ite"
 	PROP_EXT         = ".prp"
 )
 
 type VM interface {
-	RunConstantScript(path, name string, world *World) error
-	RunLiveScript(path string, world *World) error
+	RunConstantScript(path, name string) error
+	RunLiveScript(path string) error
 }
 
 type World struct {
@@ -40,8 +40,8 @@ type World struct {
 	vm             VM
 }
 
-func LoadWorld(vm VM, root string) *World {
-	w := &World{
+func LoadWorld(w *World, vm VM, root string) *World {
+	*w = World{
 		Charids:       make(map[string]*Character),
 		MapCharacters: make(map[Position]*Character),
 		MapItems:      make(map[Position]Item),
@@ -96,7 +96,7 @@ func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
 }
 
 func (w *World) loadMapScript(path, name string) error {
-	return w.vm.RunConstantScript(path, name, w)
+	return w.vm.RunConstantScript(path, name)
 }
 
 func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
@@ -114,7 +114,7 @@ func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
 		return w.loadProps(path, name)
 
 	case LIVE_SCRIPT_EXT:
-		return w.vm.RunLiveScript(path, w)
+		return w.vm.RunLiveScript(path)
 
 	default:
 		return nil

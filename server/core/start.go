@@ -19,13 +19,11 @@ var (
 	otm = helpers.NewOneToMany()
 
 	world            *types.World
-	vm               *script.VM
 	defaultCharacter types.Character
 )
 
 func Load(root string) {
-	vm = script.CreateVM()
-	world = types.LoadWorld(vm, root)
+	world = script.LoadWorld(root)
 
 	slog.Println("Got maps:")
 	for name := range world.Maps {

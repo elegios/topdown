@@ -112,7 +112,7 @@ func useItem(charId, action, blueprintId string) {
 			}
 
 		} else {
-			world.ItemBlueprints[blueprintId].Effect.RunOn(c, nil)
+			world.ItemBlueprints[blueprintId].Effect(c, nil)
 		}
 
 	case "drop":

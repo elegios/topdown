@@ -1,62 +1,55 @@
 package script
 
 import (
-	"code.google.com/p/gelo"
+	"github.com/aarzilli/golua/lua"
 	"github.com/elegios/topdown/server/types"
-	"os"
+	"log"
 )
 
-type VM gelo.VM
-type constArgs struct {
+type vm struct {
 	world *types.World
-	name  string
-}
-type vmworld types.World
-
-func CreateVM() *VM {
-	v := gelo.NewVM(nil)
-	v.RegisterBundles(langCommands)
-	v.Ns.Fork(nil)
-	return (*VM)(v)
+	l     *lua.State
 }
 
-func (v *VM) RunConstantScript(path, name string, world *types.World) error {
-	w := &constArgs{
-		world: world,
-		name:  name,
+func (v *vm) initVM(L *lua.State) int {
+	v.registerLive()
+	return 0
+}
+
+func LoadWorld(root string) *types.World {
+	v := &vm{
+		world: new(types.World),
+		l:     lua.NewState(),
 	}
-	return v.runScript(path, constBundle(w))
-}
-func constBundle(world *constArgs) map[string]interface{} {
-	return map[string]interface{}{
-		"itemb": world.ItemBlueprint,
-		"gate":  world.Gate,
-	}
+	v.l.PushGoFunction(v.initVM)
+	v.l.Call(0, 0)
+
+	types.LoadWorld(v.world, v, root)
+
+	return v.world
 }
 
-func (v *VM) RunLiveScript(path string, world *types.World) error {
-	return v.runScript(path, liveBundle(world))
-}
-func liveBundle(world *types.World) map[string]interface{} {
-	return map[string]interface{}{
-		"item":  (*vmworld)(world).Item,
-		"speak": (*vmworld)(world).SpeakAt,
-	}
+func (v *vm) RunConstantScript(path, name string) error {
+	v.toggleToConst(name)
+	defer v.toggleToLive()
+	return v.trace(v.l.DoFile(path))
 }
 
-func (v *VM) runScript(path string, bundle map[string]interface{}) (err error) {
-	vm := (*gelo.VM)(v)
-	vm.Ns.Fork(nil)
-	defer vm.Ns.Unfork()
-	vm.RegisterBundle(bundle)
-	vm.Ns.Fork(nil)
-	defer vm.Ns.Unfork()
-	f, err := os.Open(path)
+func (v *vm) RunLiveScript(path string) error {
+	return v.trace(v.l.DoFile(path))
+}
+
+func d(err error) {
 	if err != nil {
-		return
+		panic(err)
 	}
-	defer f.Close()
+}
 
-	_, err = vm.Run(f, nil)
-	return
+func (v *vm) trace(err error) error {
+	if err == nil {
+		return nil
+	}
+	log.Println(err)
+	log.Println(v.l.StackTrace())
+	return err
 }
