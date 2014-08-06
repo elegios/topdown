@@ -46,27 +46,18 @@ func (v *vm) nudge(L *lua.State) int {
 	case "recovery max":
 		target.RecoveryMax += int(amount)
 	}
-
-	if origin == nil {
-		v.world.Updates = append(v.world.Updates, types.Update{
-			Pos: target.Pos,
-			Content: types.NudgeUpdate{
-				Nudge:  nudgeType,
-				Amount: amount,
-				Target: target.Id,
-			},
-		})
-	} else {
-		v.world.Updates = append(v.world.Updates, types.Update{
-			Pos: target.Pos,
-			Content: types.NudgeCharUpdate{
-				Nudge:      nudgeType,
-				Amount:     amount,
-				OriginChar: origin.Id,
-				Target:     target.Id,
-			},
-		})
+	content := types.NudgeUpdate{
+		Nudge:  nudgeType,
+		Amount: amount,
+		Target: target.Id,
 	}
+	if origin != nil {
+		content.Character = origin.Id
+	}
+	v.world.Updates = append(v.world.Updates, types.Update{
+		Pos:     target.Pos,
+		Content: content,
+	})
 
 	return 0
 }

@@ -15,15 +15,9 @@ type SpeechPointUpdate struct {
 	Pos    Position `json:"position"`
 }
 
-type NudgeCharUpdate struct {
-	Nudge      string  `json:"nudge"`
-	Amount     float32 `json:"amount"`
-	OriginChar string  `json:"originChar"`
-	Target     string  `json:"target"`
-}
-
 type NudgeUpdate struct {
-	Nudge  string  `json:"nudge"`
-	Amount float32 `json:"amount"`
-	Target string  `json:"target"`
+	Nudge     string  `json:"nudge"`
+	Amount    float32 `json:"amount"`
+	Character string  `json:"character,omitempty"`
+	Target    string  `json:"target"`
 }
