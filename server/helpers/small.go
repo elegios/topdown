@@ -1,11 +1,5 @@
 package helpers
 
-func D(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
 func Min(a, b int) int {
 	if a < b {
 		return a
