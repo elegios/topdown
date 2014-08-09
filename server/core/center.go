@@ -63,13 +63,7 @@ func pickup(charId string) {
 	if !ok || c.Actions < 1 {
 		return
 	}
-	item, ok := world.MapItems[c.Pos]
-	if !ok {
-		return
-	}
-	delete(world.MapItems, c.Pos)
-	c.Inventory = append(c.Inventory, item.Id)
-	c.Actions--
+	world.PickupItem(c)
 }
 
 func useItem(charId, action, blueprintId string) {
@@ -77,53 +71,12 @@ func useItem(charId, action, blueprintId string) {
 	if !ok || c.Actions < 1 {
 		return
 	}
-	index := -1
-	for i, id := range c.Inventory {
-		if id == blueprintId {
-			index = i
-			break
-		}
-	}
-	if index == -1 {
-		return
-	}
-	c.Actions--
 	switch action {
 	case "use":
-		blueprint, ok := world.ItemBlueprints[blueprintId]
-		if !ok {
-			return
-		}
-
-		if blueprint.Equippable != types.EQUIP_NONE {
-			c.RemoveItem(blueprintId)
-			switch blueprint.Equippable {
-			case types.EQUIP_WEAP:
-				if c.Weapon != "" {
-					c.AddItem(c.Weapon)
-				}
-				c.Weapon = blueprintId
-
-			case types.EQUIP_ARMO:
-				if c.Armor != "" {
-					c.AddItem(c.Armor)
-				}
-				c.Armor = blueprintId
-			}
-
-		} else {
-			world.ItemBlueprints[blueprintId].Effect(c, nil)
-		}
-
+		world.UseItem(c, blueprintId)
 	case "drop":
-		pos := c.Pos
-		if _, alreadyPresent := world.MapItems[pos]; alreadyPresent {
-			return
-		}
-		c.RemoveItem(blueprintId)
-		world.MapItems[pos] = types.Item{c.Pos.X, c.Pos.Y, blueprintId}
+		world.DropItem(c, blueprintId)
 	}
-	return
 }
 
 func move(charId, direction string) {
@@ -131,48 +84,7 @@ func move(charId, direction string) {
 	if !ok || c.Actions < 1 {
 		return
 	}
-	xMod := c.Pos.X
-	yMod := c.Pos.Y
-	switch direction {
-	case "left":
-		xMod += -1
-	case "right":
-		xMod += 1
-	case "up":
-		yMod += -1
-	case "down":
-		yMod += 1
-	case "through":
-		if pos, ok := world.MapTransitions[c.Pos]; ok {
-			delete(world.MapCharacters, c.Pos)
-			c.Pos = pos
-			world.MapCharacters[c.Pos] = c
-		}
-		wlog.Print(c.Pos)
-		return
-	}
-	if yMod < 0 || xMod < 0 || yMod >= len(world.Maps[c.Pos.Mapid]) || xMod >= len(world.Maps[c.Pos.Mapid][yMod]) {
-		return
-	}
-	if world.Maps[c.Pos.Mapid][yMod][xMod].Collides() {
-		return
-	}
-	pos := types.Position{c.Pos.Mapid, xMod, yMod}
-	c.Actions--
-	if other, ok := world.MapCharacters[pos]; ok {
-		if c.Weapon != "" {
-			world.ItemBlueprints[c.Weapon].Effect(c, other)
-		}
-		return
-	}
-	if p, ok := world.MapProps[pos]; ok && p.Collide {
-		//TODO: check if something special should happen
-		return
-	}
-	delete(world.MapCharacters, c.Pos)
-	c.Pos.X = xMod
-	c.Pos.Y = yMod
-	world.MapCharacters[c.Pos] = c
+	world.MoveCharacter(c, direction)
 }
 
 func tick() {
@@ -199,12 +111,5 @@ func speak(cid, speech string) {
 		return
 	}
 
-	update := types.Update{
-		Pos: c.Pos,
-		Content: types.SpeechCharUpdate{
-			Speech:    speech,
-			Character: cid,
-		},
-	}
-	world.Updates = append(world.Updates, update)
+	world.Speak(c, speech)
 }
