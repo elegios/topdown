@@ -1,6 +1,6 @@
 package types
 
-func (w *World) MoveCharacter(c *Character, direction string) {
+func (w *World) MoveCharacter(c *Character, direction string) bool {
 	xMod := c.Pos.X
 	yMod := c.Pos.Y
 	switch direction {
@@ -18,31 +18,34 @@ func (w *World) MoveCharacter(c *Character, direction string) {
 			delete(w.MapCharacters, c.Pos)
 			c.Pos = pos
 			w.MapCharacters[c.Pos] = c
+			return true
 		}
-		return
+		return false
 	}
 	if yMod < 0 || xMod < 0 || yMod >= len(w.Maps[c.Pos.Mapid]) || xMod >= len(w.Maps[c.Pos.Mapid][yMod]) {
-		return
+		return false
 	}
 	if w.Maps[c.Pos.Mapid][yMod][xMod].Collides() {
-		return
+		return false
 	}
 	pos := Position{c.Pos.Mapid, xMod, yMod}
 	c.Actions--
 	if other, ok := w.MapCharacters[pos]; ok {
 		if c.Weapon != "" {
 			w.ItemBlueprints[c.Weapon].Effect(c, other)
+			return true
 		}
-		return
+		return false
 	}
 	if p, ok := w.MapProps[pos]; ok && p.Collide {
 		//TODO: check if something special should happen
-		return
+		return false
 	}
 	delete(w.MapCharacters, c.Pos)
 	c.Pos.X = xMod
 	c.Pos.Y = yMod
 	w.MapCharacters[c.Pos] = c
+	return true
 }
 
 func (w *World) UseItem(c *Character, blueprintId string) bool {

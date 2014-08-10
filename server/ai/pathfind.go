@@ -16,7 +16,8 @@ type node struct {
 
 // Will (probably, I haven't proven it) find a fastest path
 // if there is one, but loop infinitely otherwise
-func Find(bs func(int, int) bool, x, y, tx, ty int) []Point {
+// TODO: return nil, false when no path can be found
+func Find(bs func(int, int) bool, x, y, tx, ty int) ([]Point, bool) {
 	open := new(container)
 	start := &node{dist: 0, x: x, y: y}
 
@@ -90,7 +91,7 @@ func isEnd(n *node, tx, ty int) bool {
 	return n != nil && n.x == tx && n.y == ty
 }
 
-func buildPath(end *node) []Point {
+func buildPath(end *node) ([]Point, bool) {
 	steps := make([]Point, 0)
 	for end.prev != nil {
 		steps = append(steps, Point{X: end.x, Y: end.y})
@@ -99,7 +100,7 @@ func buildPath(end *node) []Point {
 	for i := 0; i < len(steps)/2; i++ {
 		steps[i], steps[len(steps)-i-1] = steps[len(steps)-i-1], steps[i]
 	}
-	return steps
+	return steps, true
 }
 
 func nextHori(d int, bs func(int, int) bool, n *node, tx, ty int) *node {
