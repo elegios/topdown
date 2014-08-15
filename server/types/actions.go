@@ -1,6 +1,7 @@
 package types
 
 func (w *World) MoveCharacter(c *Character, direction string) bool {
+	c.Actions--
 	xMod := c.Pos.X
 	yMod := c.Pos.Y
 	switch direction {
@@ -14,7 +15,6 @@ func (w *World) MoveCharacter(c *Character, direction string) bool {
 		yMod += 1
 	case "through":
 		if pos, ok := w.MapTransitions[c.Pos]; ok {
-			c.Actions--
 			delete(w.MapCharacters, c.Pos)
 			c.Pos = pos
 			w.MapCharacters[c.Pos] = c
@@ -29,7 +29,7 @@ func (w *World) MoveCharacter(c *Character, direction string) bool {
 		return false
 	}
 	pos := Position{c.Pos.Mapid, xMod, yMod}
-	c.Actions--
+
 	if other, ok := w.MapCharacters[pos]; ok {
 		if c.Weapon != "" {
 			w.ItemBlueprints[c.Weapon].Effect(c, other)
