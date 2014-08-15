@@ -104,18 +104,17 @@ func (r *Random) setParent(p behaviorParent) {
 
 func (p *Parallel) firstTick(a *AI) (contF, bool) {
 	ns := make([]contF, len(p.Bs))
+	cont := make([]bool, len(p.Bs))
 	for i, b := range p.Bs {
-		cont := true
-		ns[i] = b.firstTick
-		for cont && ns[i] != nil {
-			ns[i], cont = ns[i](a)
+		ns[i], cont[i] = b.firstTick(a)
+		for cont[i] && ns[i] != nil {
+			ns[i], cont[i] = ns[i](a)
 		}
 	}
-	return p.tick(ns), true
+	return p.tick(ns, cont), true
 }
-func (p *Parallel) tick(ns []contF) contF {
+func (p *Parallel) tick(ns []contF, cont []bool) contF {
 	return func(a *AI) (contF, bool) {
-		cont := make([]bool, len(ns))
 		for i, n := range ns {
 			if n == nil {
 				continue
@@ -128,7 +127,7 @@ func (p *Parallel) tick(ns []contF) contF {
 
 		// everything has now run until completion or running
 		allSuccess := !p.QuickSuccess
-		allFailure := !p.QuickFailure
+		allDone := true
 		for i, n := range ns {
 			if n == nil {
 				switch {
@@ -139,20 +138,19 @@ func (p *Parallel) tick(ns []contF) contF {
 					return p.tickUp(p, success)
 				}
 				allSuccess = allSuccess && cont[i]
-				allFailure = allFailure && !cont[i]
 
 			} else {
-				allFailure = false
 				allSuccess = false
+				allDone = false
 			}
 		}
 		if allSuccess {
 			return p.tickUp(p, success)
 		}
-		if allFailure {
+		if allDone {
 			return p.tickUp(p, failure)
 		}
-		return p.tick(ns), false
+		return p.tick(ns, cont), false
 	}
 }
 func (p *Parallel) tickFromBelow(_ *AI, _ Behavior, r behaviorResult) (contF, bool) {
