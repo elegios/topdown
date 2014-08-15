@@ -37,14 +37,24 @@ func (w *World) MoveCharacter(c *Character, direction string) bool {
 		}
 		return false
 	}
-	if p, ok := w.MapProps[pos]; ok && p.Collide {
-		//TODO: check if something special should happen
+
+	p, ok := w.MapProps[pos]
+	if ok && p.Collide {
+		if p.Effect != nil {
+			p.Effect(c)
+			return true
+		}
 		return false
 	}
+
 	delete(w.MapCharacters, c.Pos)
 	c.Pos.X = xMod
 	c.Pos.Y = yMod
 	w.MapCharacters[c.Pos] = c
+
+	if ok && p.Effect != nil {
+		p.Effect(c)
+	}
 	return true
 }
 

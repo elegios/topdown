@@ -1,7 +1,5 @@
 package types
 
-type CharacterRunnable func(origin, target *Character)
-
 const (
 	EQUIP_NONE = iota
 	EQUIP_WEAP
@@ -20,9 +18,10 @@ type ItemBlueprint struct {
 	Variation   int    `json:"variation"`
 	Description string `json:"description"`
 
-	Equippable int               `json:"-"`
-	Effect     CharacterRunnable `json:"-"`
+	Equippable int          `json:"-"`
+	Effect     itemRunnable `json:"-"`
 }
+type itemRunnable func(origin, target *Character)
 
 func (w *World) loadItems(path, mapname string) (err error) {
 	var items []Item

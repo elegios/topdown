@@ -1,11 +1,13 @@
 package types
 
 type Prop struct {
-	X         int  `json:"x"`
-	Y         int  `json:"y"`
-	Variation int  `json:"variation"`
-	Collide   bool `json:"collide"`
+	X         int          `json:"x"`
+	Y         int          `json:"y"`
+	Variation int          `json:"variation"`
+	Collide   bool         `json:"collide"`
+	Effect    propRunnable `json:"-"`
 }
+type propRunnable func(*Character)
 
 func (w *World) loadProps(path, mapname string) (err error) {
 	var props []Prop
