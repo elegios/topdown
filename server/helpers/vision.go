@@ -29,9 +29,9 @@ func Visible(blocksVision func(int, int) bool, x1, y1, x2, y2 int) bool {
 
 	for {
 		if blocksVision(cx, cy) {
-			return false
+			return cx == x2 && cy == y2
 		}
-		if (cx == x2) && (cy == y2) {
+		if cx == x2 && cy == y2 {
 			return true
 		}
 		e2 := 2 * err
