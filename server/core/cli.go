@@ -17,7 +17,9 @@ func CliControl() {
 		line, _, _ := in.ReadLine()
 		if strings.ContainsRune(string(line), 'r') {
 			unsafeLog.Println("Initiating unsafe reload of the constant world.")
-			world.LoadConstantWorld()
+			if err := world.ReloadMaps(); err != nil {
+				panic(err)
+			}
 		}
 		if strings.ContainsRune(string(line), 'q') {
 			os.Exit(0)

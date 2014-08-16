@@ -23,7 +23,7 @@ type ItemBlueprint struct {
 }
 type itemRunnable func(origin, target *Character)
 
-func (w *World) loadItems(path, mapname string) (err error) {
+func (s *saved) loadItems(path, mapname string) (err error) {
 	var items []Item
 	err = dec(path, &items)
 	if err != nil {
@@ -31,15 +31,15 @@ func (w *World) loadItems(path, mapname string) (err error) {
 	}
 
 	for _, item := range items {
-		w.MapItems[Position{mapname, item.X, item.Y}] = item
+		s.MapItems[Position{mapname, item.X, item.Y}] = item
 	}
 
 	return
 }
 
-func (w *World) saveItems(root string) (err error) {
+func (s *saved) saveItems(root string) (err error) {
 	items := make(map[string][]Item)
-	for pos, item := range w.MapItems {
+	for pos, item := range s.MapItems {
 		items[pos.Mapid] = append(items[pos.Mapid], item)
 	}
 

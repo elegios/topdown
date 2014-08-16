@@ -38,21 +38,21 @@ func (c *Character) RemoveItem(bid string) bool {
 	return false
 }
 
-func (w *World) loadCharacters(path string) (err error) {
-	err = dec(path, &w.Charids)
+func (s *saved) loadCharacters(path string) (err error) {
+	err = dec(path, &s.Charids)
 	if err != nil {
 		return
 	}
 
-	for _, c := range w.Charids {
-		w.MapCharacters[c.Pos] = c
+	for _, c := range s.Charids {
+		s.MapCharacters[c.Pos] = c
 	}
 
 	return
 }
 
-func (w *World) saveCharacters(path string) error {
-	return enc(path, w.Charids)
+func (s *saved) saveCharacters(path string) error {
+	return enc(path, s.Charids)
 }
 
 func (c *Character) UpdateActions() {

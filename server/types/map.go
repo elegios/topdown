@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"image"
 	"image/color"
 	_ "image/png"
@@ -73,13 +74,17 @@ func getPath(root, name, ext string) string {
 	return filepath.Join(root, filepath.FromSlash(name)+ext)
 }
 
-func parseMap(path string) [][]Bits {
+func parseMap(path string) ([][]Bits, error) {
 	fi, err := os.Open(path)
-	d(err)
+	if err != nil {
+		return nil, err
+	}
 	defer fi.Close()
 
 	im, _, err := image.Decode(fi)
-	d(err)
+	if err != nil {
+		return nil, err
+	}
 
 	m := make([][]Bits, im.Bounds().Size().Y)
 	for j := im.Bounds().Min.Y; j < im.Bounds().Max.Y; j++ {
@@ -89,15 +94,39 @@ func parseMap(path string) [][]Bits {
 		}
 	}
 
-	return m
-}
-func (w *World) loadMap(path, name string) error {
-	w.Maps[name] = parseMap(path)
-	return nil
+	return m, nil
 }
 
-func d(err error) {
-	if err != nil {
-		panic(err)
+func (c *constant) loadMap(path, name string) (err error) {
+	if _, alreadyThere := c.Maps[name]; alreadyThere {
+		return errors.New("Duplicate map: " + name)
 	}
+	c.Maps[name], err = parseMap(path)
+	return
+}
+
+func (w *World) ApplyPartial(pos Position, module, path string) error {
+	part := Partial{
+		Pos:  pos,
+		Path: filepath.Join(module, PARTIAL_FOLDER, path, PARTIAL_EXT),
+	}
+	w.Partials = append(w.Partials, part)
+	return w.applyPartial(part)
+}
+
+func (w *World) applyPartial(part Partial) error {
+	m, err := parseMap(filepath.Join(w.root, MODULE_FOLDER, part.Path))
+	if err != nil {
+		return err
+	}
+
+	target := w.Maps[part.Pos.Mapid]
+	xoff := part.Pos.X
+	yoff := part.Pos.Y
+	for y, column := range m {
+		for x, b := range column {
+			target[yoff+y][xoff+x] = b
+		}
+	}
+	return nil
 }

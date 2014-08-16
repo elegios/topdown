@@ -22,8 +22,8 @@ var (
 	defaultCharacter types.Character
 )
 
-func Load(root string) {
-	world = script.LoadWorld(root)
+func Load(worlddir string) {
+	world = script.LoadWorld(worlddir)
 
 	slog.Println("Got maps:")
 	for name := range world.Maps {

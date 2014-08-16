@@ -9,7 +9,7 @@ type Prop struct {
 }
 type propRunnable func(*Character)
 
-func (w *World) loadProps(path, mapname string) (err error) {
+func (s *saved) loadProps(path, mapname string) (err error) {
 	var props []Prop
 	err = dec(path, &props)
 	if err != nil {
@@ -17,15 +17,15 @@ func (w *World) loadProps(path, mapname string) (err error) {
 	}
 
 	for _, prop := range props {
-		w.MapProps[Position{mapname, prop.X, prop.Y}] = prop
+		s.MapProps[Position{mapname, prop.X, prop.Y}] = prop
 	}
 
 	return
 }
 
-func (w *World) saveProps(root string) (err error) {
+func (s *saved) saveProps(root string) (err error) {
 	props := make(map[string][]Prop)
-	for pos, prop := range w.MapProps {
+	for pos, prop := range s.MapProps {
 		props[pos.Mapid] = append(props[pos.Mapid], prop)
 	}
 

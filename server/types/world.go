@@ -6,123 +6,114 @@ import (
 )
 
 const (
-	CONST_FOLDER   = "world"
-	MAPS_FOLDER    = "maps"
-	LIVE_FOLDER    = "live"
-	INITIAL_FOLDER = "livestart"
+	MAIN_NAME   = "main"
+	LIVE_FOLDER = "live"
 
-	CHARACTER_FILE = "characters"
+	MODULE_FOLDER  = "modules"
+	MAPS_FOLDER    = "maps"
+	STORY_FOLDER   = "stories"
+	PARTIAL_FOLDER = "partials"
+
+	CHARACTER_FILE    = "characters"
+	ANNOUNCEMENT_FILE = "announcements"
+	STORIES_FILE      = "stories"
+	MODULES_FILE      = "modules"
+	PARTIALS_FILE     = "partials"
 
 	CONST_SCRIPT_EXT = ".lua"
-	LIVE_SCRIPT_EXT  = ".lua"
+	STORY_SCRIPT_EXT = ".lua"
 	MAP_EXT          = ".png"
+	PARTIAL_EXT      = ".png"
 	ITEM_EXT         = ".ite"
 	PROP_EXT         = ".prp"
 )
 
 type VM interface {
 	RunConstantScript(path, name string) error
-	RunLiveScript(path string) error
+	RunStoryScript(path string, first bool) error
 }
 
 type World struct {
-	ItemBlueprints map[string]ItemBlueprint
-	Charids        map[string]*Character
-	MapCharacters  map[Position]*Character
-	MapItems       map[Position]Item
-	MapProps       map[Position]Prop
-	MapTransitions map[Position]Position
+	saved
+	constant
 	Updates        []Update
-	Maps           map[string][][]Bits
-	mapRoot        string
-	liveMapRoot    string
-	liveRoot       string
 	vm             VM
+	root           string
+	tempModuleRoot string
 }
 
-func LoadWorld(w *World, vm VM, root string) *World {
-	*w = World{
-		Charids:       make(map[string]*Character),
-		MapCharacters: make(map[Position]*Character),
-		MapItems:      make(map[Position]Item),
-		MapProps:      make(map[Position]Prop),
+func (w *World) Load(vm VM, root string) (err error) {
+	w.vm = vm
+	w.root = root
+	w.Updates = make([]Update, 0)
+	w.initConstant()
 
-		mapRoot:     filepath.Join(root, CONST_FOLDER, MAPS_FOLDER),
-		liveMapRoot: filepath.Join(root, LIVE_FOLDER, MAPS_FOLDER),
-		liveRoot:    filepath.Join(root, LIVE_FOLDER),
+	err = w.loadSaved(filepath.Join(root, LIVE_FOLDER))
+	if err == nil {
+		for _, m := range w.Modules {
+			if err = w.applyModule(m, false); err != nil {
+				return
+			}
+		}
+		for _, p := range w.Partials {
+			if err = w.applyPartial(p); err != nil {
+				return
+			}
+		}
+		for story := range w.Stories {
+			if err = w.runStory(story, false); err != nil {
+				return
+			}
+		}
 
-		vm: vm,
+	} else {
+		if os.IsNotExist(err) {
+			w.initSaved(filepath.Join(root, LIVE_FOLDER))
+			return w.ApplyModule(MAIN_NAME)
+		} else {
+			return
+		}
 	}
 
-	d(w.LoadConstantWorld())
-
-	liveMapRoot := w.liveMapRoot
-	if _, err := os.Stat(w.liveRoot); os.IsNotExist(err) {
-		w.liveMapRoot = filepath.Join(root, CONST_FOLDER, INITIAL_FOLDER, MAPS_FOLDER)
-	}
-	filepath.Walk(w.liveMapRoot, w.loadLiveData)
-	w.liveMapRoot = liveMapRoot
-
-	w.loadCharacters(filepath.Join(root, LIVE_FOLDER, CHARACTER_FILE))
-
-	return w
+	return
 }
 
-func (w *World) LoadConstantWorld() error {
-	w.ItemBlueprints = make(map[string]ItemBlueprint)
-	w.Maps = make(map[string][][]Bits)
-	w.MapTransitions = make(map[Position]Position)
+func (w *World) ReloadMaps() (err error) {
+	w.initConstant()
 
-	return filepath.Walk(w.mapRoot, w.loadMapData)
+	for _, m := range w.Modules {
+		if err = w.applyModule(m, false); err != nil {
+			return
+		}
+	}
+	for _, p := range w.Partials {
+		if err = w.applyPartial(p); err != nil {
+			return
+		}
+	}
+	return
 }
 
-func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
-	if info.IsDir() {
-		return nil
-	}
-
-	name := getName(w.mapRoot, path)
-
-	switch filepath.Ext(path) {
-	case MAP_EXT:
-		return w.loadMap(path, name)
-
-	case CONST_SCRIPT_EXT:
-		return w.loadMapScript(path, name)
-
-	default:
-		return nil
-	}
+func (w *World) SaveWorld() error {
+	return w.save()
 }
 
-func (w *World) loadMapScript(path, name string) error {
-	return w.vm.RunConstantScript(path, name)
+type constant struct {
+	Maps           map[string][][]Bits
+	ItemBlueprints map[string]ItemBlueprint
+	MapTransitions map[Position]Position
 }
 
-func (w *World) loadLiveData(path string, info os.FileInfo, err error) error {
-	if info.IsDir() {
-		return nil
-	}
-
-	name := getName(w.liveMapRoot, path)
-
-	switch filepath.Ext(path) {
-	case ITEM_EXT:
-		return w.loadItems(path, name)
-
-	case PROP_EXT:
-		return w.loadProps(path, name)
-
-	case LIVE_SCRIPT_EXT:
-		return w.vm.RunLiveScript(path)
-
-	default:
-		return nil
+func (c *constant) initConstant() {
+	*c = constant{
+		Maps:           make(map[string][][]Bits),
+		ItemBlueprints: make(map[string]ItemBlueprint),
+		MapTransitions: make(map[Position]Position),
 	}
 }
 
-func (w *World) SaveWorld() {
-	w.saveCharacters(filepath.Join(w.liveRoot, CHARACTER_FILE))
-	w.saveItems(w.liveMapRoot)
-	w.saveProps(w.liveMapRoot)
+func d(err error) {
+	if err != nil {
+		panic(err)
+	}
 }

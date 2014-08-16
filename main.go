@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	rootdir       = "."
+	worlddir      = "world"
 	clientdir     = "client"
 	fspath        = "/"
 	websocketpath = "/ws"
@@ -14,7 +14,7 @@ const (
 )
 
 func main() {
-	core.Load(rootdir)
+	core.Load(worlddir)
 	core.Start(fspath, websocketpath, clientdir)
 	go core.CliControl()
 	http.ListenAndServe(host, nil)
