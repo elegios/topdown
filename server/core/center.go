@@ -2,7 +2,6 @@ package core
 
 import (
 	"github.com/elegios/topdown/server/helpers"
-	"github.com/elegios/topdown/server/types"
 )
 
 func center(ch <-chan request) {
