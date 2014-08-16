@@ -1,0 +1,1 @@
+gate(1, 1, {map = "othertest", x = 100, y = 100})
