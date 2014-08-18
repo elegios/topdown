@@ -1,7 +1,7 @@
 package types
 
 type Update struct {
-	Pos     Position
+	Pos     *Position
 	Content interface{}
 }
 
@@ -20,4 +20,19 @@ type NudgeUpdate struct {
 	Amount    float32 `json:"amount"`
 	Character string  `json:"character,omitempty"`
 	Target    string  `json:"target"`
+}
+
+type Announcement struct {
+	Group, Message string
+}
+
+func (w *World) Announce(group, message string) {
+	a := Announcement{
+		Group:   group,
+		Message: message,
+	}
+	w.Updates = append(w.Updates, Update{
+		Content: a,
+	})
+	w.Announcements = append(w.Announcements, a)
 }

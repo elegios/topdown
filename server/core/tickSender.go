@@ -103,7 +103,7 @@ func collectVisible(update *tickUpdate) {
 		}
 	}
 	for _, u := range world.Updates {
-		if update.positions[u.Pos] {
+		if u.Pos == nil || update.positions[*u.Pos] {
 			update.Updates = append(update.Updates, u.Content)
 		}
 	}

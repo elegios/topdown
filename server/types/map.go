@@ -108,19 +108,22 @@ func (c *constant) loadMap(path, name string) (err error) {
 func (w *World) ApplyPartial(pos Position, module, path string) error {
 	part := Partial{
 		Pos:  pos,
-		Path: filepath.Join(module, PARTIAL_FOLDER, path, PARTIAL_EXT),
+		Path: filepath.Join(module, PARTIAL_FOLDER, path+PARTIAL_EXT),
 	}
 	w.Partials = append(w.Partials, part)
 	return w.applyPartial(part)
 }
 
 func (w *World) applyPartial(part Partial) error {
+	target, ok := w.Maps[part.Pos.Mapid]
+	if !ok {
+		return errors.New("Nonexistant map: " + part.Pos.Mapid)
+	}
 	m, err := parseMap(filepath.Join(w.root, MODULE_FOLDER, part.Path))
 	if err != nil {
 		return err
 	}
 
-	target := w.Maps[part.Pos.Mapid]
 	xoff := part.Pos.X
 	yoff := part.Pos.Y
 	for y, column := range m {

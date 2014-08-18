@@ -131,8 +131,9 @@ func (w *World) PickupItem(c *Character) bool {
 }
 
 func (w *World) Speak(c *Character, speech string) {
+	p := c.Pos
 	update := Update{
-		Pos: c.Pos,
+		Pos: &p,
 		Content: SpeechCharUpdate{
 			Speech:    speech,
 			Character: c.Id,
@@ -143,7 +144,7 @@ func (w *World) Speak(c *Character, speech string) {
 
 func (w *World) SpeakAt(p Position, speech string) {
 	update := Update{
-		Pos: p,
+		Pos: &p,
 		Content: SpeechPointUpdate{
 			Speech: speech,
 			Pos:    p,

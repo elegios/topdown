@@ -10,7 +10,7 @@ POS = {
   {{ map = "othertest", x = 104, y = 108 }, { map = "othertest", x = 103, y = 83 }},
 }
 WALL_POS = {
-  map = "temple",
+  map = "othertest",
   x = 98,
   y = 79,
 }
@@ -31,24 +31,24 @@ data = {
 -- subsequent run, in which case the function should
 -- perform some sort of recovery
 function main(firstRun)
-  if !firstRun then
+  if not firstRun then
     for i = 1, KEY_COUNT do
-      data[i].open = retrieveValue(data[i].key) or false
+      data[i].open = retrieve_value(data[i].key) or false
     end
   end
 
   for i = 1, KEY_COUNT do
-    if !data[i].open then
+    if not data[i].open then
       -- Creates, removes or replaces a prop
-      prop(POS[i][1], {
+      prop({
         variation = LOCKED_VARIATION,
         collide = true,
         effect = keyeffect(i),
-      })
-      prop(POS[i][2], {
+      }, POS[i][1])
+      prop({
         variation = LOCKED_VARIATION,
         collide = true,
-      })
+      }, POS[i][2])
     end
   end
 
@@ -60,15 +60,15 @@ end
 function keyeffect(index)
   return function(character)
     data[index].open = true
-    storeValue(data[index].key, true)
-    prop(POS[index][1], {
+    store_value(data[index].key, true)
+    prop({
       variation = UNLOCKED_VARIATION,
       collide = true,
-    })
-    prop(POS[index][2], {
+    }, POS[index][1])
+    prop({
       variation = UNLOCKED_VARIATION,
       collide = true,
-    })
+    }, POS[index][2])
     checkEnd(character)
   end
 end
@@ -76,20 +76,20 @@ end
 function checkEnd(character)
   local count = 0
   for i = 1, KEY_COUNT do
-    if data.[i].open then
-      count++
+    if data[i].open then
+      count = count + 1
     end
   end
   if count == 4 then
     -- Creates an announcement that will be saved in the
     -- history of the world
-    announce(QUESTNAME, character.name .. " has broken the last seal.")
+    announce(QUESTNAME, character.Name .. " has broken the last seal.")
   elseif count == 3 then
-    announce(QUESTNAME, character.name .. " has broken the third seal.")
+    announce(QUESTNAME, character.Name .. " has broken the third seal.")
   elseif count == 2 then
-    announce(QUESTNAME, character.name .. " has broken the second seal.")
+    announce(QUESTNAME, character.Name .. " has broken the second seal.")
   elseif count == 1 then
-    announce(QUESTNAME, character.name .. " has broken the first seal.")
+    announce(QUESTNAME, character.Name .. " has broken the first seal.")
   end
   if count < KEY_COUNT then
     return
@@ -98,7 +98,7 @@ function checkEnd(character)
   -- Puts the map in <module-dir>/partials/_<argument2>.png on top of
   -- the already existing map, with the upper left corner on
   -- the position specified by the first argument
-  applyPartial(WALL_POS, GATES_OPENED_PARTIAL)
+  apply_partial(GATES_OPENED_PARTIAL, WALL_POS)
   announce(QUESTNAME, "The gates to the temple have been opened.")
   -- Starts a substory residing in <module-dir>/stories/<argument>.lua
   -- Can contain slashes to denote subdirs

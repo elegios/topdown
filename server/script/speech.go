@@ -7,34 +7,17 @@ import (
 
 func (v *vm) say(L *lua.State) int {
 	if L.IsTable(2) {
-		L.GetField(2, "map")
-		L.GetField(2, "x")
-		L.GetField(2, "y")
-		pos := types.Position{
-			Mapid: L.ToString(-3),
-			X:     L.ToInteger(-2),
-			Y:     L.ToInteger(-1),
-		}
-		update := types.Update{
-			Pos: pos,
-			Content: types.SpeechPointUpdate{
-				Pos:    pos,
-				Speech: L.CheckString(1),
-			},
-		}
-		v.world.Updates = append(v.world.Updates, update)
+		v.world.SpeakAt(checkPosition(L, 2), L.CheckString(1))
 
 	} else {
 		character := L.ToGoStruct(2).(*types.Character)
-		update := types.Update{
-			Pos: character.Pos,
-			Content: types.SpeechCharUpdate{
-				Character: character.Id,
-				Speech:    L.CheckString(1),
-			},
-		}
-		v.world.Updates = append(v.world.Updates, update)
+		v.world.Speak(character, L.CheckString(1))
 	}
 
+	return 0
+}
+
+func (v *vm) announce(L *lua.State) int {
+	v.world.Announce(L.CheckString(1), L.CheckString(2))
 	return 0
 }

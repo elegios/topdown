@@ -13,11 +13,8 @@ type saved struct {
 	Announcements []Announcement
 	Modules       []string
 	Partials      []Partial
-	Stories       map[string]map[string]interface{}
+	Stories       map[storyKey]map[string]interface{}
 	liveDir       string
-}
-type Announcement struct {
-	Group, Message string
 }
 type Partial struct {
 	Pos  Position
@@ -107,7 +104,7 @@ func (s *saved) initSaved(liveDir string) {
 		Announcements: make([]Announcement, 0),
 		Modules:       make([]string, 0),
 		Partials:      make([]Partial, 0),
-		Stories:       make(map[string]map[string]interface{}),
+		Stories:       make(map[storyKey]map[string]interface{}),
 		liveDir:       liveDir,
 	}
 }

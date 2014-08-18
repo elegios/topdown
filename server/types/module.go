@@ -18,10 +18,7 @@ func (w *World) applyModule(module string, first bool) (err error) {
 	}
 
 	if first {
-		err = w.RunStory(module, "main")
-		if err != nil {
-			return
-		}
+		w.RunStory(module, "main")
 	}
 
 	w.Modules = append(w.Modules, module)

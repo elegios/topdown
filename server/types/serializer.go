@@ -13,6 +13,10 @@ var (
 	dec Decoder = GobDecode
 )
 
+func init() {
+	gob.Register(Position{})
+}
+
 func GobEncode(path string, v interface{}) (err error) {
 	fi, err := os.Open(path)
 	if err != nil {

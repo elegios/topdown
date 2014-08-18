@@ -54,8 +54,9 @@ func (v *vm) nudge(L *lua.State) int {
 	if origin != nil {
 		content.Character = origin.Id
 	}
+	p := target.Pos
 	v.world.Updates = append(v.world.Updates, types.Update{
-		Pos:     target.Pos,
+		Pos:     &p,
 		Content: content,
 	})
 

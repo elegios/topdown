@@ -36,17 +36,6 @@ func (v *vm) RunConstantScript(path, name string) error {
 	return v.trace(v.l.DoFile(path))
 }
 
-func (v *vm) RunStoryScript(path string, first bool) (err error) {
-	//TODO: mostly incorrect, should fire up another thread or another luastate
-	err = v.trace(v.l.DoFile(path))
-	if err != nil {
-		return
-	}
-	v.l.GetGlobal("main")
-	v.l.PushBoolean(first)
-	return v.trace(v.l.Call(1, 0))
-}
-
 func d(err error) {
 	if err != nil {
 		panic(err)

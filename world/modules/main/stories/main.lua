@@ -14,4 +14,5 @@ function main()
 		x = 6,
 		y = 4,
 	})
+	apply_module("ancient_temple")
 end

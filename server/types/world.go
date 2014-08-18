@@ -30,7 +30,7 @@ const (
 
 type VM interface {
 	RunConstantScript(path, name string) error
-	RunStoryScript(path string, first bool) error
+	RunStoryScript(module, name, path string, first bool)
 }
 
 type World struct {
@@ -61,9 +61,7 @@ func (w *World) Load(vm VM, root string) (err error) {
 			}
 		}
 		for story := range w.Stories {
-			if err = w.runStory(story, false); err != nil {
-				return
-			}
+			w.runStory(story, false)
 		}
 
 	} else {

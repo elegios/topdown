@@ -53,15 +53,7 @@ func (v *vm) itemb(L *lua.State, equippable int) int {
 }
 
 func (v *vm) itemLive(L *lua.State) int {
-	L.CheckType(2, lua.LUA_TTABLE)
-	L.GetField(2, "map")
-	L.GetField(2, "x")
-	L.GetField(2, "y")
-	pos := types.Position{
-		Mapid: L.ToString(-3),
-		X:     L.ToInteger(-2),
-		Y:     L.ToInteger(-1),
-	}
+	pos := checkPosition(L, 2)
 	v.world.MapItems[pos] = types.Item{ //TODO: fail when already exists?
 		X:  pos.X,
 		Y:  pos.Y,

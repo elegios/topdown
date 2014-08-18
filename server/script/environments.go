@@ -30,6 +30,9 @@ func (v *vm) registerLive() {
 	v.l.Register("give", v.give)
 	v.l.Register("take", v.take)
 	v.l.Register("say", v.say)
+	v.l.Register("prop", v.prop)
+	v.l.Register("announce", v.announce)
+	v.l.Register("apply_module", v.applyModule)
 }
 
 func (v *vm) unregisterLive() {
@@ -43,6 +46,23 @@ func (v *vm) unregisterLive() {
 	v.l.SetGlobal("take")
 	v.l.PushNil()
 	v.l.SetGlobal("say")
+	v.l.PushNil()
+	v.l.SetGlobal("prop")
+	v.l.PushNil()
+	v.l.SetGlobal("announce")
+	v.l.PushNil()
+	v.l.SetGlobal("apply_module")
+}
+
+func (s *storyVm) registerStory() {
+	s.registerLive()
+	s.l.Register("prop", s.prop)
+	s.l.Register("retrieve_value", s.retrieveValue)
+	s.l.Register("store_value", s.storeValue)
+	s.l.Register("auto_end", s.autoEnd)
+	s.l.Register("apply_partial", s.applyPartial)
+	s.l.Register("substory", s.subStory)
+	s.l.Register("end_story", s.endStory)
 }
 
 func (v *vm) toggleToLive() {
