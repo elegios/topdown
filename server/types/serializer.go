@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/gob"
 	"os"
+	"path/filepath"
 )
 
 type Decoder func(path string, v interface{}) error
@@ -18,7 +19,11 @@ func init() {
 }
 
 func GobEncode(path string, v interface{}) (err error) {
-	fi, err := os.Open(path)
+	err = os.MkdirAll(filepath.Dir(path), 0777)
+	if err != nil {
+		return
+	}
+	fi, err := os.Create(path)
 	if err != nil {
 		return
 	}

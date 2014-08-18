@@ -51,6 +51,7 @@ func (s *saved) save() (err error) {
 
 func (s *saved) loadSaved(liveDir string) (err error) {
 	s.liveDir = liveDir
+	s.MapCharacters = make(map[Position]*Character)
 	err = s.loadCharacters(filepath.Join(s.liveDir, CHARACTER_FILE))
 	if err != nil {
 		return

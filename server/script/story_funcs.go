@@ -41,8 +41,11 @@ func (s *storyVm) retrieveValue(L *lua.State) int {
 		L.PushInteger(int64(v.Y))
 		L.SetField(2, "y")
 
+	case nil:
+		L.PushNil()
+
 	default:
-		panic("Unsupported type retrieved")
+		L.RaiseError("Unsupported type retrieved")
 	}
 
 	return 1

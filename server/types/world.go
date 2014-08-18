@@ -98,7 +98,7 @@ func (w *World) ReloadMaps() (err error) {
 	return
 }
 
-func (w *World) SaveWorld() error {
+func (w *World) Save() error {
 	return w.save()
 }
 
