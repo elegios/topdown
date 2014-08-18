@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 )
@@ -60,8 +61,13 @@ func (w *World) Load(vm VM, root string) (err error) {
 				return
 			}
 		}
+		numMods := len(w.Modules)
+		numPars := len(w.Partials)
 		for story := range w.Stories {
 			w.runStory(story, false)
+		}
+		if len(w.Modules) != numMods || len(w.Partials) != numPars {
+			return errors.New("A story in recovery applied a partial or module")
 		}
 
 	} else {
