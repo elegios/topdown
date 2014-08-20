@@ -25,7 +25,13 @@ func (w *World) applyModule(module string, first bool) (err error) {
 	return
 }
 
-func (w *World) loadMapData(path string, info os.FileInfo, _ error) error {
+func (w *World) loadMapData(path string, info os.FileInfo, err error) error {
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		panic(err)
+	}
 	if info.IsDir() {
 		return nil
 	}
