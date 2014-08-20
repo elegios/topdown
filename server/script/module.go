@@ -1,7 +1,7 @@
 package script
 
 import (
-	"github.com/aarzilli/golua/lua"
+	"github.com/elegios/golua/lua"
 )
 
 func (v *vm) applyModule(L *lua.State) int {

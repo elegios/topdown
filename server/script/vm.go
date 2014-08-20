@@ -1,7 +1,7 @@
 package script
 
 import (
-	"github.com/aarzilli/golua/lua"
+	"github.com/elegios/golua/lua"
 	"github.com/elegios/topdown/server/types"
 	"log"
 	"os"
