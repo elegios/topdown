@@ -1,7 +1,7 @@
 package script
 
 import (
-	"github.com/elegios/golua/lua"
+	"github.com/aarzilli/golua/lua"
 )
 
 type storyVm struct {
