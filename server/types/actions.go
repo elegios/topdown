@@ -21,6 +21,8 @@ func (w *World) MoveCharacter(c *Character, direction string) bool {
 			return true
 		}
 		return false
+	default:
+		return false
 	}
 	if yMod < 0 || xMod < 0 || yMod >= len(w.Maps[c.Pos.Mapid]) || xMod >= len(w.Maps[c.Pos.Mapid][yMod]) {
 		return false
