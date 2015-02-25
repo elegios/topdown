@@ -13,6 +13,9 @@ type vm struct {
 }
 
 func (v *vm) initVM(L *lua.State) int {
+	v.l.OpenBase()
+	v.l.OpenTable()
+	v.l.OpenString()
 	v.registerLive()
 	return 0
 }

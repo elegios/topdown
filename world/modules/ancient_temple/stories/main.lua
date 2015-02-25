@@ -16,7 +16,6 @@ WALL_POS = {
 }
 GATES_OPENED_PARTIAL = "gates_opened"
 CONTINUATION = "gates_opened"
-KEY_COUNT = 4
 
 -- Variables
 data = {
@@ -31,14 +30,18 @@ data = {
 -- subsequent run, in which case the function should
 -- perform some sort of recovery
 function main(firstRun)
+  -- Determines whether story will end when execution reaches end of main function
+  -- Defaults to true
+  auto_end(false)
+
   if not firstRun then
-    for i = 1, KEY_COUNT do
+    for i,_ in ipairs(data) do
       data[i].open = retrieve_value(data[i].key) or false
     end
   end
 
-  for i = 1, KEY_COUNT do
-    if not data[i].open then
+  for i,open in ipairs(data) do
+    if not open then
       -- Creates, removes or replaces a prop
       prop({
         variation = LOCKED_VARIATION,
@@ -51,10 +54,6 @@ function main(firstRun)
       }, POS[i][2])
     end
   end
-
-  -- Determines whether story will end when execution reaches end of main function
-  -- Defaults to true
-  auto_end(false)
 end
 
 function keyeffect(index)
@@ -75,8 +74,8 @@ end
 
 function checkEnd(character)
   local count = 0
-  for i = 1, KEY_COUNT do
-    if data[i].open then
+  for _,open in ipairs(data) do
+    if open then
       count = count + 1
     end
   end
@@ -91,7 +90,7 @@ function checkEnd(character)
   elseif count == 1 then
     announce(QUESTNAME, character.Name .. " has broken the first seal.")
   end
-  if count < KEY_COUNT then
+  if count < table.getn(POS) then
     return
   end
 
@@ -108,4 +107,3 @@ function checkEnd(character)
   -- all props must be removed or have no effects
   end_story()
 end
-

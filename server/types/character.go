@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/elegios/topdown/server/helpers"
+  "github.com/elegios/topdown/server/helpers"
 )
 
 type Character struct {
