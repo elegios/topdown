@@ -23,6 +23,9 @@ func (v *vm) RunStoryScript(module, name, path string, first bool) {
 		module:  module,
 		name:    name,
 	}
+	s.vm.l.OpenBase()
+	s.vm.l.OpenTable()
+	s.vm.l.OpenString()
 	go s.run(path, first)
 	<-s.control
 }
